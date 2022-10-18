@@ -64,12 +64,13 @@ pub fn instantiate(
 
     let croncat_funding = estimate_croncat_funding(info.funds, &config);
 
+    
     // ask croncat to start executing these tasks
     let _croncat_msg = WasmMsg::Execute {
         contract_addr: CRONCAT_CONTRACT_ADDR.to_string(),
-        msg: to_binary(&cw_croncat::ExecuteMsg::CreateTask {
+        msg: to_binary(&cw_croncat_core::msg::ExecuteMsg::CreateTask {
             task: cw_croncat_core::msg::TaskRequest {
-                interval: cw_croncat::slots::Interval::Cron(msg.cron),
+                interval: cw_croncat_core::types::Interval::Cron(msg.cron),
                 boundary: Option::None, // todo set boundary for when job expires i guess (can also customize start time)
                 stop_on_fail: false,
                 actions: vec![Action {

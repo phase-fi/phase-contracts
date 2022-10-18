@@ -40,25 +40,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "apollo-router-contract"
-version = "1.0.0"
-dependencies = [
- "apollo-router",
- "cosmwasm-bignumber",
- "cosmwasm-std",
- "cw-asset",
- "cw-storage-plus",
- "cw1155",
- "cw2",
- "cw20",
- "itertools",
- "schemars",
- "serde",
- "strum",
- "thiserror",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -282,26 +263,6 @@ dependencies = [
  "cw20",
  "schemars",
  "serde",
-]
-
-[[package]]
-name = "cw-croncat"
-version = "0.0.1"
-source = "git+https://github.com/njerschow/cw-croncat.git#f936cf479b8960843bdf79127407d07e43849e77"
-dependencies = [
- "cosmwasm-std",
- "cosmwasm-storage",
- "cron_schedule",
- "cw-croncat-core",
- "cw-rules-core",
- "cw-storage-plus",
- "cw2",
- "cw20",
- "hex",
- "schemars",
- "serde",
- "sha2 0.9.9",
- "thiserror",
 ]
 
 [[package]]
@@ -725,12 +686,10 @@ name = "phase-finance"
 version = "0.1.0"
 dependencies = [
  "apollo-router",
- "apollo-router-contract",
  "cosmwasm-schema",
  "cosmwasm-std",
  "cosmwasm-storage",
  "cw-asset",
- "cw-croncat",
  "cw-croncat-core",
  "cw-multi-test",
  "cw-storage-plus",

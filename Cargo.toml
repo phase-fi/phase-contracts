@@ -50,9 +50,7 @@ serde = { version = "1.0.137", default-features = false, features = ["derive"] }
 strum = "0.24.1"
 strum_macros = "0.24.2"
 thiserror = { version = "1.0.31" }
-cw-croncat = { git = "https://github.com/njerschow/cw-croncat.git" }
 cw-croncat-core = { git = "https://github.com/njerschow/cw-croncat.git" }
-apollo-router-contract = { path = "./../apollo-router/contracts/router" }
 apollo-router = { path = "./../apollo-router/packages/router" }
 cw-asset = "2.3.0"
 
