@@ -58,9 +58,3 @@ pub enum QueryMsg {
     // get the strategy config
     GetStrategyConfig {},
 }
-
-// We define a custom struct for each query response
-#[cw_serde]
-pub struct GetCountResponse {
-    pub count: i32,
-}

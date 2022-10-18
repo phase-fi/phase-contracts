@@ -1,5 +1,21 @@
+use cosmwasm_std::{Addr, Coin, Uint128};
 use cosmwasm_schema::{cw_serde};
-use cosmwasm_std::Uint128;
+
+
+
+#[cw_serde]
+pub struct DcaConfig {
+    pub strategy_creator: Addr,
+    pub strategy_type: StrategyType,
+    pub amount_per_trade: Uint128,
+    pub num_trades: Uint128,
+    pub cron: String, 
+    pub source: Coin,
+    // can DCA into multiple coins
+    pub destinations: Vec<CoinWeight>,
+    pub platform_wallet: Addr,
+    pub platform_fee: Uint128,
+}
 
 #[cw_serde]
 pub enum StrategyType {

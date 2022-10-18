@@ -46,6 +46,7 @@ thiserror = { version = "1.0.37" }
 cw-asset = "2.3.0"
 cw-croncat-core = { git = "https://github.com/njerschow/cw-croncat.git" }
 apollo-router = { path = "./../apollo-router/packages/router" }
+phase-finance = { path = "../../packages/phase-finance" }
 
 [dev-dependencies]
 cw-multi-test = "0.13.2"
