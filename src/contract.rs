@@ -104,14 +104,23 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        ExecuteMsg::CancelDca {} => try_cancel_dca(deps, env, info),
         ExecuteMsg::PerformDca {} => try_perform_dca(deps, env, info),
+        ExecuteMsg::PauseDca {} => todo!(),
+        ExecuteMsg::ResumeDca {} => todo!(),
+        ExecuteMsg::CancelDca {} => try_cancel_dca(deps, env, info),
+        ExecuteMsg::ClaimFunds {} => todo!(),
     }
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
-    match msg {}
+    match msg {
+        QueryMsg::GetUpcomingSwap {} => todo!(),
+        QueryMsg::GetAllUpcomingSwaps {} => todo!(),
+        QueryMsg::GetBondedFunds {} => todo!(),
+        QueryMsg::GetClaimableFunds {} => todo!(),
+        QueryMsg::GetStrategyConfig {} => todo!(),
+    }
 }
 
 #[cfg(test)]
