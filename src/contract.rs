@@ -3,7 +3,7 @@ use std::ops::Mul;
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult, WasmMsg,
+    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, WasmMsg,
 };
 use cw2::set_contract_version;
 use cw_croncat_core::types::Action;
@@ -11,8 +11,8 @@ use cw_croncat_core::types::Action;
 use crate::constants::CRONCAT_CONTRACT_ADDR;
 use crate::error::ContractError;
 use crate::execute::{try_cancel_dca, try_perform_dca};
-use crate::msg::{ExecuteMsg, GetCountResponse, InstantiateMsg, QueryMsg};
-use crate::state::{Config, State, CONFIG, STATE};
+use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::state::{Config, CONFIG};
 use crate::utils::estimate_croncat_funding;
 
 // version info for migration info
@@ -65,7 +65,7 @@ pub fn instantiate(
     let croncat_funding = estimate_croncat_funding(info.funds, &config);
 
     // ask croncat to start executing these tasks
-    let croncat_msg = WasmMsg::Execute {
+    let _croncat_msg = WasmMsg::Execute {
         contract_addr: CRONCAT_CONTRACT_ADDR.to_string(),
         msg: to_binary(&cw_croncat::ExecuteMsg::CreateTask {
             task: cw_croncat_core::msg::TaskRequest {
@@ -113,7 +113,7 @@ pub fn execute(
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetUpcomingSwap {} => todo!(),
         QueryMsg::GetAllUpcomingSwaps {} => todo!(),
@@ -131,8 +131,8 @@ mod tests {
     use cosmwasm_std::testing::{
         mock_dependencies, mock_dependencies_with_balance, mock_env, mock_info,
     };
-    use cosmwasm_std::{coins, from_binary, Addr, BankMsg, Coin, CosmosMsg, Decimal, Uint128};
-    use osmosis_std::shim::Timestamp;
+    use cosmwasm_std::{coins, from_binary, Addr, BankMsg, CosmosMsg, Decimal, Uint128};
+    
 
     #[test]
     fn proper_initialization() {
@@ -199,7 +199,7 @@ mod tests {
 
         match wasm_msg {
             apollo_router::msg::ExecuteMsg::Swap {
-                to,
+                to: _,
                 max_spread,
                 recipient,
                 hook_msg,

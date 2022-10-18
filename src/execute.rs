@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    to_binary, BankMsg, Coin, CosmosMsg, Decimal, DepsMut, Env, MessageInfo, Response, SubMsg,
+    to_binary, BankMsg, Coin, Decimal, DepsMut, Env, MessageInfo, Response, SubMsg,
     WasmMsg,
 };
 use cw_asset::Asset;
@@ -40,8 +40,8 @@ pub fn try_cancel_dca(
 
 pub fn try_perform_dca(
     deps: DepsMut,
-    env: Env,
-    info: MessageInfo,
+    _env: Env,
+    _info: MessageInfo,
 ) -> Result<Response, ContractError> {
     let config = CONFIG.load(deps.storage)?;
 
