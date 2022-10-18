@@ -1,4 +1,5 @@
-use cw_storage_plus::Item;
+use cosmwasm_std::{Uint128};
+use cw_storage_plus::{Item, Map};
 use phase_finance::types::{DcaConfig};
 
 // struct SubmitOrder {
@@ -28,3 +29,4 @@ use phase_finance::types::{DcaConfig};
 // }
 
 pub const CONFIG: Item<DcaConfig> = Item::new("config");
+pub const BONDED_BALANCES: Map<String, Uint128> = Map::new("bonded_balances");
