@@ -19,6 +19,7 @@ use crate::types::{CoinWeight, StrategyType};
 // strategy_config: Nikita
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
 pub struct InstantiateMsg {
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
