@@ -3,11 +3,9 @@ use cosmwasm_std::{
     WasmMsg,
 };
 use cw_asset::Asset;
-
-use phase_finance::{DCA_SWAP_ID};
+use phase_finance::constants::{APOLLO_ROUTER_ADDRESS, DCA_SWAP_ID};
 
 use crate::{
-    constants::{APOLLO_ROUTER_ADDRESS},
     state::CONFIG,
     ContractError,
 };

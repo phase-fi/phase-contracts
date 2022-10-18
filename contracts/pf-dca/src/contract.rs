@@ -13,7 +13,7 @@ use crate::error::ContractError;
 use crate::execute::{try_cancel_dca, try_perform_dca};
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{Config, CONFIG};
-use crate::utils::estimate_croncat_funding;
+use phase_finance::utils::estimate_croncat_funding;
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:phase-finance";
@@ -126,7 +126,7 @@ pub fn query(_deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
 
 #[cfg(test)]
 mod tests {
-    use crate::types::{CoinWeight, StrategyType};
+    use phase_finance::types::{CoinWeight, StrategyType};
 
     use super::*;
     use cosmwasm_std::testing::{

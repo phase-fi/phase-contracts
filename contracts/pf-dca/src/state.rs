@@ -2,7 +2,7 @@ use cosmwasm_schema::{cw_serde};
 use cosmwasm_std::{Addr, Coin, Uint128};
 use cw_storage_plus::Item;
 
-use crate::types::{CoinWeight, StrategyType};
+use phase_finance::types::{CoinWeight, StrategyType};
 
 #[cw_serde]
 pub struct State {
