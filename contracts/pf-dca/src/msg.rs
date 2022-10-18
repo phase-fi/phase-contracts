@@ -1,6 +1,5 @@
+use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Addr, Uint128};
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
 
 use crate::types::{CoinWeight, StrategyType};
 
@@ -18,8 +17,7 @@ use crate::types::{CoinWeight, StrategyType};
 // claimable: J0nl1
 // strategy_config: Nikita
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
+#[cw_serde]
 pub struct InstantiateMsg {
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
@@ -31,8 +29,7 @@ pub struct InstantiateMsg {
     pub platform_fee: Uint128,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
+#[cw_serde]
 pub enum ExecuteMsg {
     // perform swaps required for the dca
     PerformDca {},
@@ -48,8 +45,7 @@ pub enum ExecuteMsg {
     ClaimFunds {},
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
+#[cw_serde]
 pub enum QueryMsg {
     // get the next swap that will be performed
     GetUpcomingSwap {},
@@ -64,7 +60,7 @@ pub enum QueryMsg {
 }
 
 // We define a custom struct for each query response
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[cw_serde]
 pub struct GetCountResponse {
     pub count: i32,
 }

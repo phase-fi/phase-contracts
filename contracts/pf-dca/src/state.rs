@@ -1,12 +1,10 @@
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
-
+use cosmwasm_schema::{cw_serde};
 use cosmwasm_std::{Addr, Coin, Uint128};
 use cw_storage_plus::Item;
 
 use crate::types::{CoinWeight, StrategyType};
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[cw_serde]
 pub struct State {
     pub count: i32,
     pub owner: Addr,
@@ -14,7 +12,7 @@ pub struct State {
 
 pub const STATE: Item<State> = Item::new("state");
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[cw_serde]
 pub struct Config {
     pub strategy_creator: Addr,
     pub strategy_type: StrategyType,
