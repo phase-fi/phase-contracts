@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use phase_finance::CoinWeight;
-    use crate::{helpers::CwTemplateContract, types::StrategyType};
+    use phase_finance::types::{CoinWeight, StrategyType};
     use crate::msg::InstantiateMsg;
     use cosmwasm_std::{Addr, Coin, Empty, Uint128};
     use cw_multi_test::{App, AppBuilder, Contract, ContractWrapper, Executor};
@@ -35,7 +34,7 @@ mod tests {
         })
     }
 
-    fn proper_instantiate() -> (App, CwTemplateContract) {
+    fn proper_instantiate() -> App {
         let mut app = mock_app();
         let cw_template_id = app.store_code(contract_template());
 
@@ -62,22 +61,6 @@ mod tests {
             )
             .unwrap();
 
-        let cw_template_contract = CwTemplateContract(cw_template_contract_addr);
-
-        (app, cw_template_contract)
-    }
-
-    mod count {
-        
-        
-
-        // #[test]
-        // fn count() {
-        //     let (mut app, cw_template_contract) = proper_instantiate();
-
-        //     let msg = ExecuteMsg::Increment {};
-        //     let cosmos_msg = cw_template_contract.call(msg).unwrap();
-        //     app.execute(Addr::unchecked(USER), cosmos_msg).unwrap();
-        // }
+         app
     }
 }
