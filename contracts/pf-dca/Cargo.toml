@@ -1,0 +1,52 @@
+[package]
+name = "pf-dca"
+version = "0.1.0"
+authors = ["njerschow <nj18@nyu.edu>", "j0nl1 <jonlitech@gmail.com>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'abort'
+incremental = false
+overflow-checks = true
+
+[features]
+# for more explicit tests, cargo test --features=backtraces
+backtraces = ["cosmwasm-std/backtraces"]
+# use library feature to disable all instantiate/execute/query exports
+library = []
+
+[package.metadata.scripts]
+optimize = """docker run --rm -v "$(pwd)":/code \
+  --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
+  --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
+  cosmwasm/rust-optimizer:0.12.6
+"""
+
+[dependencies]
+cosmwasm-std = "1.1.5"
+cosmwasm-schema = { version = "1.1.5" }
+cosmwasm-storage = "1.1.5"
+cw-storage-plus = "0.16.0"
+cw2 = "0.16.0"
+osmosis-std = "0.1.7"
+strum = "0.24.1"
+strum_macros = "0.24.2"
+thiserror = { version = "1.0.37" }
+cw-asset = "2.3.0"
+cw-croncat-core = { git = "https://github.com/njerschow/cw-croncat.git" }
+apollo-router = { path = "./../apollo-router/packages/router" }
+phase-finance = { path = "../../packages/phase-finance" }
+
+[dev-dependencies]
+cw-multi-test = "0.13.2"

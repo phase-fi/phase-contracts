@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::types::CoinWeight;
+    use phase_finance::CoinWeight;
     use crate::{helpers::CwTemplateContract, types::StrategyType};
     use crate::msg::InstantiateMsg;
     use cosmwasm_std::{Addr, Coin, Empty, Uint128};
