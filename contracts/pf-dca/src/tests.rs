@@ -1,8 +1,7 @@
 use std::vec;
 
 use cosmwasm_std::testing::{
-    mock_dependencies, mock_dependencies_with_balance, mock_env, mock_info, MockApi, MockQuerier,
-    MockStorage,
+    mock_dependencies, mock_env, mock_info, MockApi, MockQuerier, MockStorage,
 };
 use cosmwasm_std::{
     coins, from_binary, to_binary, Addr, BankMsg, Coin, CosmosMsg, Decimal, OwnedDeps, StdError,
