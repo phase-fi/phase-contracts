@@ -1,7 +1,7 @@
 use cosmwasm_std::StdError;
 use thiserror::Error;
 
-#[derive(Error, Debug)]
+#[derive(Error, Debug, PartialEq)]
 pub enum ContractError {
     #[error("{0}")]
     Std(#[from] StdError),
@@ -11,6 +11,9 @@ pub enum ContractError {
 
     #[error("No balance")]
     NoBalance {},
+
+    #[error("No task hash")]
+    NoTaskHash {},
 
     #[error("Custom Error val: {val:?}")]
     CustomError { val: String },

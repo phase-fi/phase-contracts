@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Addr, Uint128, AllBalanceResponse};
+use cosmwasm_std::{Addr, Coin, Uint128};
 
 use phase_finance::types::{CoinWeight, StrategyType};
 
@@ -55,10 +55,10 @@ pub enum QueryMsg {
     #[returns(())]
     GetAllUpcomingSwaps {},
     // get the amount of funds that are bonded
-    #[returns(AllBalanceResponse)]
-    GetBondedFunds,
+    #[returns(Coin)]
+    GetBondedFunds {},
     // get the amount of funds that are claimable
-    #[returns(())]
+    #[returns(Vec<Coin>)]
     GetClaimableFunds {},
     // get the strategy config
     #[returns(())]
