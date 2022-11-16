@@ -72,7 +72,7 @@ pub fn instantiate(
         msg: to_binary(&cw_croncat_core::msg::ExecuteMsg::CreateTask {
             task: cw_croncat_core::msg::TaskRequest {
                 interval: cw_croncat_core::types::Interval::Cron(msg.cron),
-                boundary: Option::None, // todo set boundary for when job expires i guess (can also customize start time)
+                boundary: Option::None, // todo: set boundary for when job expires i guess (can also customize start time)
                 stop_on_fail: false,
                 actions: vec![Action {
                     msg: WasmMsg::Execute {
@@ -81,7 +81,7 @@ pub fn instantiate(
                         funds: vec![],
                     }
                     .into(),
-                    // Is there any concern with not passing in a gas limit?
+                    // todo: Is there any concern with not passing in a gas limit?
                     gas_limit: Option::None,
                 }],
                 rules: Option::None,
@@ -125,13 +125,36 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     }
 }
 
-fn query_bonded_funds(deps: Deps) -> StdResult<AllBalanceResponse> {
-    let amount: StdResult<Vec<Coin>> = BONDED_BALANCES
-        .range(deps.storage, None, None, Order::Ascending)
-        .map(|b| -> StdResult<Coin> {
-            let (denom, amount) = b?;
-            Ok(Coin { denom, amount })
-        })
+// fn query_upcoming_swap(deps: Deps, env: Env) -> StdResult<UpcomingSwapResponse> {
+//     let config = CONFIG.load(deps.storage)?;
+
+//     // let our_swaps = cw_croncat_core::msg::QueryMsg::GetTasksByOwner { owner_id: () }
+
+//     // Ok(UpcomingSwapResponse {
+//     //     next_swap_time: next_swap_time,
+//     // })
+// }
+
+fn query_bonded_funds(deps: Deps, env: Env) -> StdResult<Coin> {
+    Ok(deps.querier.query_balance(
+        env.contract.address,
+        CONFIG.load(deps.storage)?.source.denom,
+    )?)
+}
+
+fn query_claimable_funds(deps: Deps, env: Env) -> StdResult<Vec<Coin>> {
+    let destinations: Vec<String> = CONFIG
+        .load(deps.storage)?
+        .destinations
+        .iter()
+        .map(|d| d.denom.clone())
+        .collect();
+
+    let balances = deps
+        .querier
+        .query_all_balances(env.contract.address)?
+        .into_iter()
+        .filter(|coin| destinations.contains(&coin.denom))
         .collect();
 
     Ok(AllBalanceResponse { amount: amount? })
