@@ -45,7 +45,7 @@ strum_macros = "0.24.2"
 thiserror = { version = "1.0.37" }
 cw-asset = "2.3.0"
 cw-croncat-core = { git = "https://github.com/njerschow/cw-croncat.git" }
-apollo-router = { path = "./../apollo-router/packages/router" }
+apollo-router = { path = "../../packages/apollo-router" }
 phase-finance = { path = "../../packages/phase-finance" }
 
 [dev-dependencies]

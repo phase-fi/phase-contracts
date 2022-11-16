@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use phase_finance::types::{CoinWeight, StrategyType};
     use crate::msg::InstantiateMsg;
     use cosmwasm_std::{Addr, Coin, Empty, Uint128};
     use cw_multi_test::{App, AppBuilder, Contract, ContractWrapper, Executor};
+    use phase_finance::types::{CoinWeight, StrategyType};
 
     pub fn contract_template() -> Box<dyn Contract<Empty>> {
         let contract = ContractWrapper::new(
@@ -61,6 +61,6 @@ mod tests {
             )
             .unwrap();
 
-         app
+        app
     }
 }

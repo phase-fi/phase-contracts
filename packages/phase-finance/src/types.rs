@@ -1,7 +1,5 @@
+use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Addr, Coin, Uint128};
-use cosmwasm_schema::{cw_serde};
-
-
 
 #[cw_serde]
 pub struct DcaConfig {
@@ -9,7 +7,7 @@ pub struct DcaConfig {
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
     pub num_trades: Uint128,
-    pub cron: String, 
+    pub cron: String,
     pub source: Coin,
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
