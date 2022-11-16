@@ -13,8 +13,8 @@ use crate::error::ContractError;
 use crate::execute::{try_cancel_dca, try_perform_dca};
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{BONDED_BALANCES, CONFIG};
-use phase_finance::types::DcaConfig;
 use phase_finance::constants::CRONCAT_CONTRACT_ADDR;
+use phase_finance::types::DcaConfig;
 use phase_finance::utils::estimate_croncat_funding;
 
 // version info for migration info
@@ -115,11 +115,11 @@ pub fn execute(
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetUpcomingSwap {} => todo!(),
         QueryMsg::GetAllUpcomingSwaps {} => todo!(),
-        QueryMsg::GetBondedFunds {} => to_binary(&query_bonded_funds(deps)?),
+        QueryMsg::GetBondedFunds {} => to_binary(&query_bonded_funds(deps, env)?),
         QueryMsg::GetClaimableFunds {} => todo!(),
         QueryMsg::GetStrategyConfig {} => todo!(),
     }
@@ -142,7 +142,7 @@ fn query_bonded_funds(deps: Deps, env: Env) -> StdResult<Coin> {
     )?)
 }
 
-fn query_claimable_funds(deps: Deps, env: Env) -> StdResult<Vec<Coin>> {
+fn query_claimable_funds(deps: Deps, env: Env) -> StdResult<AllBalanceResponse> {
     let destinations: Vec<String> = CONFIG
         .load(deps.storage)?
         .destinations
@@ -150,12 +150,12 @@ fn query_claimable_funds(deps: Deps, env: Env) -> StdResult<Vec<Coin>> {
         .map(|d| d.denom.clone())
         .collect();
 
-    let balances = deps
+    let balances: Vec<Coin> = deps
         .querier
         .query_all_balances(env.contract.address)?
         .into_iter()
         .filter(|coin| destinations.contains(&coin.denom))
         .collect();
 
-    Ok(AllBalanceResponse { amount: amount? })
+    Ok(AllBalanceResponse { amount: balances })
 }
