@@ -122,8 +122,8 @@ checksum = "722e23542a15cea1f65d4a1419c4cfd7a26706c70871a13a04238ca3f40f1661"
 [[package]]
 name = "cosmwasm-bignumber"
 version = "2.2.0"
-source = "git+https://github.com/apollodao/apollo-bignumber.git?tag=v0.1.0#bb96cf1d55f39918da74799078ae6318caacbc83"
 dependencies = [
+ "cosmwasm-schema",
  "cosmwasm-std",
  "schemars",
  "serde",
@@ -754,6 +754,7 @@ version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cw-croncat-core",
  "thiserror",
 ]
 

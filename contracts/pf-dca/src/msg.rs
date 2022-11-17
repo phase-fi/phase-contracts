@@ -1,7 +1,7 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Addr, Uint128, AllBalanceResponse};
 
-use phase_finance::types::{CoinWeight, StrategyType};
+use phase_finance::types::{CoinWeight, StrategyType, UpcomingSwapResponse};
 
 // Execute:
 // create/instantiate: Both collab
@@ -49,7 +49,7 @@ pub enum ExecuteMsg {
 #[derive(QueryResponses)]
 pub enum QueryMsg {
     // get the next swap that will be performed
-    #[returns(())]
+    #[returns(UpcomingSwapResponse)]
     GetUpcomingSwap {},
     // get all upcoming swaps
     #[returns(())]

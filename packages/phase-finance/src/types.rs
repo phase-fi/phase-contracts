@@ -1,6 +1,6 @@
 use cosmwasm_std::{Addr, Coin, Uint128};
 use cosmwasm_schema::{cw_serde};
-
+use cw_croncat_core::types::SlotType;
 
 
 #[cw_serde]
@@ -15,6 +15,7 @@ pub struct DcaConfig {
     pub destinations: Vec<CoinWeight>,
     pub platform_wallet: Addr,
     pub platform_fee: Uint128,
+    pub croncat_task_hash: Option<String>,
 }
 
 #[cw_serde]
@@ -30,4 +31,10 @@ pub enum StrategyType {
 pub struct CoinWeight {
     pub denom: String,
     pub weight: Uint128,
+}
+
+#[cw_serde]
+pub struct UpcomingSwapResponse {
+    pub next: Uint128,
+    pub slot_type: SlotType,
 }

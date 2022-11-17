@@ -7,4 +7,5 @@ edition = "2018"
 [dependencies]
 cosmwasm-std = "1.1.5"
 cosmwasm-schema = { version = "1.1.5" }
+cw-croncat-core = { git = "https://github.com/njerschow/cw-croncat.git" }
 thiserror = { version = "1.0.26" }
