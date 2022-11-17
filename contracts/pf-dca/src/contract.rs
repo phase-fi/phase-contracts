@@ -1,20 +1,19 @@
-use std::ops::Mul;
+
 
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    from_binary, to_binary, AllBalanceResponse, Binary, Coin, Deps, DepsMut, Env, MessageInfo,
-    Order, Reply, Response, StdError, StdResult, SubMsg, SubMsgResponse, WasmMsg, Uint128,
+    to_binary, AllBalanceResponse, Binary, Coin, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdError, StdResult, SubMsg, SubMsgResponse, WasmMsg, Uint128,
 };
 use cw2::set_contract_version;
 use cw_croncat_core::msg::TaskResponse;
 use cw_croncat_core::traits::Intervals;
-use cw_croncat_core::types::{Action, BoundaryValidated, Interval};
+use cw_croncat_core::types::{Action, BoundaryValidated};
 
 use crate::error::ContractError;
 use crate::execute::{try_cancel_dca, try_perform_dca};
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{BONDED_BALANCES, CONFIG};
+use crate::state::{CONFIG};
 use phase_finance::constants::CRONCAT_CONTRACT_ADDR;
 use phase_finance::types::{DcaConfig, UpcomingSwapResponse};
 use phase_finance::utils::estimate_croncat_funding;

@@ -50,7 +50,7 @@ mod tests {
             platform_wallet: Addr::unchecked("osmo123".to_string()),
             platform_fee: Uint128::zero(),
         };
-        let cw_template_contract_addr = app
+        let _cw_template_contract_addr = app
             .instantiate_contract(
                 cw_template_id,
                 Addr::unchecked(ADMIN),
