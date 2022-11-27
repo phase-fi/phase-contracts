@@ -1,7 +1,6 @@
+use cosmwasm_schema::{cw_serde, schemars::Map};
 use cosmwasm_std::{Addr, Coin, Uint128};
-use cosmwasm_schema::{cw_serde};
 use cw_croncat_core::types::SlotType;
-
 
 #[cw_serde]
 pub struct DcaConfig {
@@ -9,11 +8,11 @@ pub struct DcaConfig {
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
     pub num_trades: Uint128,
-    pub cron: String, 
+    pub cron: String,
     pub source: Coin,
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
-    
+
     // platform fee (configurable by caller)
     pub platform_fee: Uint128,
     // platform fee recipient (configurable by caller)
@@ -44,3 +43,5 @@ pub struct UpcomingSwapResponse {
     pub next: Uint128,
     pub slot_type: SlotType,
 }
+
+
