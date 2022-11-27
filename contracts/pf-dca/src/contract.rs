@@ -1,24 +1,26 @@
 #[cfg(not(feature = "library"))]
+use cosmwasm_schema::{cw_serde, schemars::Map};
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
     to_binary, AllBalanceResponse, Binary, Coin, Deps, DepsMut, Env, MessageInfo, Reply, Response,
     StdError, StdResult, SubMsg, SubMsgResponse, Uint128,
 };
 use cw2::set_contract_version;
+use std::str::FromStr;
 
 use cw_croncat_core::traits::Intervals;
 use cw_croncat_core::types::BoundaryValidated;
 use phase_finance::constants::DCA_SWAP_ID;
 
 use crate::execute::{try_cancel_dca, try_perform_dca};
-use crate::state::CONFIG;
+use crate::state::{CONFIG, DCA_RECORD};
 
 use phase_finance::croncat_helpers::{
     construct_croncat_task_init, extract_croncat_task_hash, get_croncat_task,
 };
 use phase_finance::error::ContractError;
 use phase_finance::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use phase_finance::types::{DcaConfig, UpcomingSwapResponse};
+use phase_finance::types::{DcaConfig, DcaRecord, SwapEvent, UpcomingSwapResponse};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:phase-finance";
@@ -71,10 +73,54 @@ pub fn instantiate(
         use_croncat: msg.use_croncat,
     };
 
+    let cron_schedule = cron_schedule::Schedule::from_str(&config.cron).unwrap();
+    // we add one to the take to skip the very first execution time but still have num_trades executions
+    let execution_times = cron_schedule
+        .upcoming()
+        .take((config.num_trades.u128() as usize) + 1);
+
+    
+    let mut swap_events = Map::<u64, SwapEvent>::new();
+
+    let mut start_time = 0;
+    let mut end_time = 0;
+    for (i, execution_time) in execution_times.enumerate() {
+        // always skip first execution time (idk why tbh, i just dont want to miss it)
+        if (i == 0) {
+            continue;
+        };
+        if (i == 1) {
+            start_time = execution_time
+        }
+        if (i == (config.num_trades.u128() as usize)) {
+            end_time = execution_time
+        }
+
+        swap_events.insert(
+            execution_time,
+            SwapEvent {
+                executed: false,
+                token_in: Coin {
+                    amount: config.amount_per_trade,
+                    denom: config.source.denom.clone(),
+                },
+                effective_tokens_out: vec![],
+                timestamp_nanos: execution_time,
+                effective_timestamp_nanos: 0,
+            },
+        );
+    }
+
+    let dca_record = DcaRecord {
+        swap_events,
+    };
+
     // ask croncat to start executing these tasks
-    let croncat_msg = construct_croncat_task_init(deps.as_ref(), &info, &env, &config)?;
+    let croncat_msg =
+        construct_croncat_task_init(deps.as_ref(), &info, &env, &config, start_time, end_time)?;
 
     CONFIG.save(deps.storage, &config)?;
+    DCA_RECORD.save(deps.storage, &dca_record)?;
 
     Ok(Response::new()
         // .add_message(croncat_msg)

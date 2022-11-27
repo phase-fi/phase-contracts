@@ -47,6 +47,7 @@ cw-asset = "2.3.0"
 cw-croncat-core = { git = "https://github.com/njerschow/cw-croncat.git" }
 apollo-router = { path = "../../packages/apollo-router" }
 phase-finance = { path = "../../packages/phase-finance" }
+cron_schedule = "0.2.2"
 
 [dev-dependencies]
 cw-multi-test = "0.13.2"

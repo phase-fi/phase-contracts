@@ -46,10 +46,16 @@ pub struct UpcomingSwapResponse {
 
 #[cw_serde]
 pub struct SwapEvent {
+    // whether or not the swap was executed yet
     pub executed: bool,
-    pub token_in: Vec<Coin>,
-    pub effective_tokens_out: Option<Vec<Coin>>,
+    // the source token denom and the amount_per_trade amount
+    pub token_in: Coin,
+    // will be empty if the swap failed or didnt happen yet
+    pub effective_tokens_out: Vec<Coin>,
+    // the  timestamp for which this swap is scheduled
     pub timestamp_nanos: u64, // here we add other necessary info whenever swaps happen.
+    // the actual timestamp for when this swap was executed, will be 0 if not executed yet
+    pub effective_timestamp_nanos: u64
 }
 
 #[cw_serde]

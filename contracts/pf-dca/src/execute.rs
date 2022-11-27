@@ -69,7 +69,7 @@ pub fn try_perform_dca(
 
     let in_funds = vec![Coin {
         denom: config.source.denom.clone(),
-        amount: config.source.amount / config.num_trades,
+        amount: config.amount_per_trade,
     }];
 
     let to_assets = config

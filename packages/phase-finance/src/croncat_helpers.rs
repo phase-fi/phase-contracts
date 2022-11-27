@@ -24,13 +24,13 @@ pub fn get_croncat_config(deps: Deps) -> StdResult<GetConfigResponse> {
     Ok(croncat_config)
 }
 
-pub fn calculate_croncat_funding(deps: Deps, num_trades:Uint128) -> StdResult<Vec<Coin>> {
+pub fn calculate_croncat_funding(deps: Deps, num_trades: Uint128) -> StdResult<Vec<Coin>> {
     // get num_trades and
     let croncat_config = get_croncat_config(deps)?;
 
     // this is completely fucking wrong
-    let croncat_fee = croncat_config.agent_fee.amount
-        + Uint128::from(croncat_config.gas_price) * num_trades;
+    let croncat_fee =
+        croncat_config.agent_fee.amount + Uint128::from(croncat_config.gas_price) * num_trades;
 
     Ok(vec![Coin {
         denom: croncat_config.agent_fee.denom,
@@ -47,18 +47,10 @@ pub fn construct_croncat_task_init(
     _info: &MessageInfo,
     env: &Env,
     config: &DcaConfig,
+    start_time: u64,
+    end_time: u64,
 ) -> Result<WasmMsg, StdError> {
     let croncat_funding = calculate_croncat_funding(deps, config.num_trades)?;
-
-    let cron_schedule = cron_schedule::Schedule::from_str(&config.cron).unwrap();
-    let execution_times = cron_schedule
-        .upcoming()
-        .take((config.num_trades.u128() as usize) + 1)
-        .collect::<Vec<u64>>();
-
-    // we add one to the take above to skip the very first execution time but still have num_trades executions
-    let start_time = execution_times[1];
-    let end_time = execution_times[execution_times.len() - 1];
 
     Ok(WasmMsg::Execute {
         contract_addr: CRONCAT_CONTRACT_ADDR.to_string(),

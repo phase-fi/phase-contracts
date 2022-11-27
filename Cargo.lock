@@ -729,6 +729,7 @@ dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
  "cosmwasm-storage",
+ "cron_schedule",
  "cw-asset",
  "cw-croncat-core",
  "cw-multi-test",
@@ -754,7 +755,6 @@ version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
- "cron_schedule",
  "cw-croncat-core",
  "thiserror",
 ]
