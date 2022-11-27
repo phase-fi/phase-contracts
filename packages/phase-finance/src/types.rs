@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, schemars::Map};
-use cosmwasm_std::{Addr, Coin, Uint128};
+use cosmwasm_std::{Addr, Coin, Env, Uint128};
 use cw_croncat_core::types::SlotType;
 
 #[cw_serde]
@@ -46,13 +46,42 @@ pub struct UpcomingSwapResponse {
 
 #[cw_serde]
 pub struct SwapEvent {
-    executed: bool,
-    token_in: Vec<Coin>,
-    effective_tokens_out: Option<Vec<Coin>>,
-    // here we add other necessary info whenever swaps happen.
+    pub executed: bool,
+    pub token_in: Vec<Coin>,
+    pub effective_tokens_out: Option<Vec<Coin>>,
+    pub timestamp_nanos: u64, // here we add other necessary info whenever swaps happen.
 }
 
 #[cw_serde]
 pub struct DcaRecord {
     pub swap_events: Map<u64, SwapEvent>,
+}
+
+impl DcaRecord {
+    pub fn get_last_swap_event(&self, env: &Env) -> Option<&SwapEvent> {
+        let now = env.block.time;
+
+        let mut last_swap_event = Option::None;
+        for (swap_event_timestamp, value) in self.swap_events.iter() {
+            // update last swap event if it happened in the past
+            if swap_event_timestamp < &now.nanos() {
+                last_swap_event = Some(value);
+            }
+        }
+
+        last_swap_event
+    }
+
+    pub fn get_next_swap_event(&self, env: &Env) -> Option<&SwapEvent> {
+        let now = env.block.time;
+
+        for (swap_event_timestamp, value) in self.swap_events.iter() {
+            // return as soon as we find a swap event in the future
+            if swap_event_timestamp > &now.nanos() {
+                return Some(value);
+            }
+        }
+
+        return Option::None;
+    }
 }

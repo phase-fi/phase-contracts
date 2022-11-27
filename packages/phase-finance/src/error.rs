@@ -12,6 +12,9 @@ pub enum ContractError {
     #[error("No balance")]
     NoBalance {},
 
+    #[error("Swap already executed, next swap will be executable at {next_swap_event_time:?}")]
+    SwapAlreadyExecuted { next_swap_event_time : String },
+
     #[error("Custom Error val: {val:?}")]
     CustomError { val: String },
     // Add any other custom errors you like here.

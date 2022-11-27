@@ -29,5 +29,5 @@ use phase_finance::types::{DcaConfig, DcaRecord};
 // }
 
 pub const CONFIG: Item<DcaConfig> = Item::new("config");
-pub const SWAP_EVENTS: Item<DcaRecord> = Item::new("dca_record");
+pub const DCA_RECORD: Item<DcaRecord> = Item::new("dca_record");
 pub const BONDED_BALANCES: Map<String, Uint128> = Map::new("bonded_balances");

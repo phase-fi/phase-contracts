@@ -4,8 +4,9 @@ use cosmwasm_std::{
 use cw_asset::Asset;
 use phase_finance::constants::{APOLLO_ROUTER_ADDRESS, DCA_SWAP_ID};
 use phase_finance::error::ContractError;
+use phase_finance::types::SwapEvent;
 
-use crate::state::CONFIG;
+use crate::state::{CONFIG, DCA_RECORD};
 
 pub fn try_cancel_dca(
     deps: DepsMut,
@@ -37,11 +38,31 @@ pub fn try_cancel_dca(
 
 pub fn try_perform_dca(
     deps: DepsMut,
-    _env: Env,
+    env: Env,
     _info: MessageInfo,
 ) -> Result<Response, ContractError> {
     let config = CONFIG.load(deps.storage)?;
+    let dca_record = DCA_RECORD.load(deps.storage)?;
 
+    let last_swap_event = dca_record.get_last_swap_event(&env);
+    let next_swap_event = dca_record.get_next_swap_event(&env);
+    let next_swap_event_time = match next_swap_event {
+        Some(event) => event.timestamp_nanos.to_string(),
+        None => "never".to_string(),
+    };
+
+    // todo: Throw this all into a validate_dca_execution function
+    match last_swap_event {
+        Some(last_swap_event) => {
+            // if last swap event was already executed, do not allow another swap for this period
+            if last_swap_event.executed {
+                return Err(ContractError::SwapAlreadyExecuted { next_swap_event_time });
+            } 
+        }
+        None => return Err(ContractError::CustomError {
+            val: "DCA swap not allowed yet, next execution is ".to_owned() + &next_swap_event_time,
+        }),
+    }
     // let balance = deps
     //     .querier
     //     .query_balance(env.contract.address, config.source.denom.clone())?;
