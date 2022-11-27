@@ -20,3 +20,6 @@ Currently if you are querying more than 5 minutes after the croncat instantiatio
 
 `osmosisd query wasm  contract-state smart REPLACE_WITH_YOUR_DEPLOYED_CONTRACT_ADDRESS '{"get_upcoming_swap":{}}' --node https://rpc.testnet.osmosis.zone:443 --chain-id osmo-test-4`
 
+
+
+gas_base_fee + gas_action_fee*actiions.length

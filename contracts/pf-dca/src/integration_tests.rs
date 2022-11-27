@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use phase_finance::types::{CoinWeight, StrategyType};
-    use crate::msg::InstantiateMsg;
+    use phase_finance::msg::InstantiateMsg;
     use cosmwasm_std::{Addr, Coin, Empty, Uint128};
     use cw_multi_test::{App, AppBuilder, Contract, ContractWrapper, Executor};
 

@@ -1,7 +1,7 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Addr, Uint128, AllBalanceResponse};
 
-use phase_finance::types::{CoinWeight, StrategyType, UpcomingSwapResponse};
+use crate::types::{CoinWeight, StrategyType, UpcomingSwapResponse};
 
 // Execute:
 // create/instantiate: Both collab

@@ -6,8 +6,8 @@ use cosmwasm_std::testing::{
 use phase_finance::types::{CoinWeight, StrategyType};
 
 use crate::contract::{instantiate, execute, query};
-use crate::msg::{InstantiateMsg, ExecuteMsg, QueryMsg};
 use crate::state::BONDED_BALANCES;
+use phase_finance::msg::{InstantiateMsg, ExecuteMsg, QueryMsg};
 
 
 #[test]

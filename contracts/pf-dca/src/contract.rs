@@ -1,9 +1,8 @@
-
-
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, AllBalanceResponse, Binary, Coin, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdError, StdResult, SubMsg, SubMsgResponse, WasmMsg, Uint128,
+    to_binary, AllBalanceResponse, Binary, Coin, Deps, DepsMut, Env, MessageInfo, Reply, Response,
+    StdError, StdResult, SubMsg, SubMsgResponse, Uint128, WasmMsg,
 };
 use cw2::set_contract_version;
 use cw_croncat_core::msg::TaskResponse;
@@ -12,11 +11,11 @@ use cw_croncat_core::types::{Action, BoundaryValidated};
 
 use crate::error::ContractError;
 use crate::execute::{try_cancel_dca, try_perform_dca};
-use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use crate::state::{CONFIG};
+use crate::state::CONFIG;
+use phase_finance::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use phase_finance::constants::CRONCAT_CONTRACT_ADDR;
 use phase_finance::types::{DcaConfig, UpcomingSwapResponse};
-use phase_finance::utils::estimate_croncat_funding;
+use phase_finance::utils::{estimate_croncat_funding, construct_croncat_task_init};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:phase-finance";
@@ -65,36 +64,14 @@ pub fn instantiate(
         cron: msg.cron.clone(),
         platform_wallet: msg.platform_wallet,
         platform_fee: msg.platform_fee,
-        croncat_task_hash: Option::None, // populated during reply
+        croncat_task_hash: Option::None,
     };
 
-    let croncat_funding = estimate_croncat_funding(info.funds, &config);
+    
 
     // ask croncat to start executing these tasks
-    let croncat_msg = WasmMsg::Execute {
-        contract_addr: CRONCAT_CONTRACT_ADDR.to_string(),
-        msg: to_binary(&cw_croncat_core::msg::ExecuteMsg::CreateTask {
-            task: cw_croncat_core::msg::TaskRequest {
-                interval: cw_croncat_core::types::Interval::Cron(msg.cron),
-                boundary: Option::None, // todo: set boundary for when job expires i guess (can also customize start time)
-                stop_on_fail: false,
-                actions: vec![Action {
-                    msg: WasmMsg::Execute {
-                        contract_addr: env.contract.address.to_string(),
-                        msg: to_binary(&ExecuteMsg::PerformDca {})?,
-                        funds: vec![],
-                    }
-                    .into(),
-                    // todo: Is there any concern with not passing in a gas limit?
-                    gas_limit: Option::None,
-                }],
-                rules: Option::None,
-                cw20_coins: vec![],
-            },
-        })?,
-        funds: croncat_funding,
-    };
-
+    let croncat_msg = construct_croncat_task_init(&info, &env, &config)?;
+    
     CONFIG.save(deps.storage, &config)?;
 
     Ok(Response::new()
@@ -200,10 +177,13 @@ fn query_upcoming_swap(deps: Deps, env: Env) -> StdResult<UpcomingSwapResponse> 
             let task_query = cw_croncat_core::msg::QueryMsg::GetTask {
                 task_hash: task_hash,
             };
-            let task: Option<TaskResponse> = deps.querier.query(&cosmwasm_std::WasmQuery::Smart {
-                contract_addr: CRONCAT_CONTRACT_ADDR.to_string(),
-                msg: to_binary(&task_query)?,
-            }.into())?;
+            let task: Option<TaskResponse> = deps.querier.query(
+                &cosmwasm_std::WasmQuery::Smart {
+                    contract_addr: CRONCAT_CONTRACT_ADDR.to_string(),
+                    msg: to_binary(&task_query)?,
+                }
+                .into(),
+            )?;
             // let task: Option<TaskResponse> = from_binary(&response)?;
 
             match task {
