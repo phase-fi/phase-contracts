@@ -44,4 +44,15 @@ pub struct UpcomingSwapResponse {
     pub slot_type: SlotType,
 }
 
+#[cw_serde]
+pub struct SwapEvent {
+    executed: bool,
+    token_in: Vec<Coin>,
+    effective_tokens_out: Option<Vec<Coin>>,
+    // here we add other necessary info whenever swaps happen.
+}
 
+#[cw_serde]
+pub struct DcaRecord {
+    pub swap_events: Map<u64, SwapEvent>,
+}
