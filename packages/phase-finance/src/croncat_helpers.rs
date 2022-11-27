@@ -44,7 +44,7 @@ pub fn calculate_croncat_funding(deps: Deps, num_trades:Uint128) -> StdResult<Ve
 
 pub fn construct_croncat_task_init(
     deps: Deps,
-    info: &MessageInfo,
+    _info: &MessageInfo,
     env: &Env,
     config: &DcaConfig,
 ) -> Result<WasmMsg, StdError> {
