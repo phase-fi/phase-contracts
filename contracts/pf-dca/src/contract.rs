@@ -8,6 +8,7 @@ use cw2::set_contract_version;
 
 use cw_croncat_core::traits::Intervals;
 use cw_croncat_core::types::BoundaryValidated;
+use phase_finance::constants::DCA_SWAP_ID;
 
 use crate::execute::{try_cancel_dca, try_perform_dca};
 use crate::state::CONFIG;
@@ -107,6 +108,16 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
             }
             cosmwasm_std::SubMsgResult::Err(_) => Err(StdError::GenericErr {
                 msg: "croncat job failed with error: ".to_string() + &msg.result.unwrap_err(),
+            }),
+        },
+        DCA_SWAP_ID => match msg.result {
+            cosmwasm_std::SubMsgResult::Ok(reply_msg) => {
+                // in the function below (will be named process_dca_swap_response), we will need to get the swapEvent timestamp to avoid the edge case where a swap is executed just before the next swap begins, and we receive the swap response after, setting the swapEvent.executed value to true on the next swap event rather than the one we want. But I am tired and I forgot how to pass the swapEvent key correctly.
+                // also in the function below, if everything checks out we need to set the swapEvent.executed value to true
+                todo!()
+            }
+            cosmwasm_std::SubMsgResult::Err(_) => Err(StdError::GenericErr {
+                msg: "dca swap failed with error: ".to_string() + &msg.result.unwrap_err(),
             }),
         },
         _ => Err(StdError::GenericErr {

@@ -95,6 +95,6 @@ pub fn try_perform_dca(
 
     // add the message to swap & send funds to user
     Ok(Response::new()
-        .add_submessage(SubMsg::reply_on_error(msg, DCA_SWAP_ID)) // todo:: handle reply
+        .add_submessage(SubMsg::reply_always(msg, DCA_SWAP_ID)) // todo:: handle reply
         .add_attribute("method", "try_perform_dca"))
 }
