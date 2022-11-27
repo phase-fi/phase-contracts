@@ -2,19 +2,19 @@
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
     to_binary, AllBalanceResponse, Binary, Coin, Deps, DepsMut, Env, MessageInfo, Reply, Response,
-    StdError, StdResult, SubMsg, SubMsgResponse, Uint128, WasmMsg,
+    StdError, StdResult, SubMsg, SubMsgResponse, Uint128,
 };
 use cw2::set_contract_version;
-use cw_croncat_core::msg::TaskResponse;
+
 use cw_croncat_core::traits::Intervals;
-use cw_croncat_core::types::{Action, BoundaryValidated};
+use cw_croncat_core::types::{BoundaryValidated};
 
 use crate::error::ContractError;
 use crate::execute::{try_cancel_dca, try_perform_dca};
 use crate::state::CONFIG;
-use phase_finance::constants::CRONCAT_CONTRACT_ADDR;
+
 use phase_finance::croncat_helpers::{
-    construct_croncat_task_init, estimate_croncat_funding, extract_croncat_task_hash,
+    construct_croncat_task_init, extract_croncat_task_hash,
     get_croncat_task,
 };
 use phase_finance::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
@@ -99,7 +99,7 @@ pub fn execute(
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn reply(deps: DepsMut, env: Env, msg: Reply) -> StdResult<Response> {
+pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
     match msg.id {
         CRONCAT_INIT_REPLY_ID => match msg.result {
             cosmwasm_std::SubMsgResult::Ok(reply_msg) => {

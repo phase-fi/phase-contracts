@@ -1,6 +1,6 @@
 use cosmwasm_schema::write_api;
 
-use pf_dca::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use phase_finance::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 
 fn main() {
     write_api! {

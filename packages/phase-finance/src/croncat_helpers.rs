@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    to_binary, DepsMut, Env, MessageInfo, Response, StdError, StdResult, SubMsgResponse, WasmMsg, Deps,
+    to_binary, Env, MessageInfo, StdError, StdResult, SubMsgResponse, WasmMsg, Deps,
 };
 use cosmwasm_std::{Coin, Uint128};
 use cw_croncat_core::msg::TaskResponse;
