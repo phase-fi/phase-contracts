@@ -1,5 +1,5 @@
 #[cfg(not(feature = "library"))]
-use cosmwasm_schema::{cw_serde, schemars::Map};
+use cosmwasm_schema::{schemars::Map};
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
     to_binary, AllBalanceResponse, Binary, Coin, Deps, DepsMut, Env, MessageInfo, Reply, Response,
@@ -86,13 +86,13 @@ pub fn instantiate(
     let mut end_time = 0;
     for (i, execution_time) in execution_times.enumerate() {
         // always skip first execution time (idk why tbh, i just dont want to miss it)
-        if (i == 0) {
+        if i == 0 {
             continue;
         };
-        if (i == 1) {
+        if i == 1 {
             start_time = execution_time
         }
-        if (i == (config.num_trades.u128() as usize)) {
+        if i == (config.num_trades.u128() as usize) {
             end_time = execution_time
         }
 
@@ -157,7 +157,7 @@ pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
             }),
         },
         DCA_SWAP_ID => match msg.result {
-            cosmwasm_std::SubMsgResult::Ok(reply_msg) => {
+            cosmwasm_std::SubMsgResult::Ok(_reply_msg) => {
                 // in the function below (will be named process_dca_swap_response), we will need to get the swapEvent timestamp to avoid the edge case where a swap is executed just before the next swap begins, and we receive the swap response after, setting the swapEvent.executed value to true on the next swap event rather than the one we want. But I am tired and I forgot how to pass the swapEvent key correctly.
                 // also in the function below, if everything checks out we need to set the swapEvent.executed value to true
                 todo!()

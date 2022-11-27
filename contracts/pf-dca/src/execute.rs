@@ -4,7 +4,7 @@ use cosmwasm_std::{
 use cw_asset::Asset;
 use phase_finance::constants::{APOLLO_ROUTER_ADDRESS, DCA_SWAP_ID};
 use phase_finance::error::ContractError;
-use phase_finance::types::SwapEvent;
+
 
 use crate::state::{CONFIG, DCA_RECORD};
 
