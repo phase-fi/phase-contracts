@@ -7,16 +7,15 @@ use cosmwasm_std::{
 use cw2::set_contract_version;
 
 use cw_croncat_core::traits::Intervals;
-use cw_croncat_core::types::{BoundaryValidated};
+use cw_croncat_core::types::BoundaryValidated;
 
-use crate::error::ContractError;
 use crate::execute::{try_cancel_dca, try_perform_dca};
 use crate::state::CONFIG;
 
 use phase_finance::croncat_helpers::{
-    construct_croncat_task_init, extract_croncat_task_hash,
-    get_croncat_task,
+    construct_croncat_task_init, extract_croncat_task_hash, get_croncat_task,
 };
+use phase_finance::error::ContractError;
 use phase_finance::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use phase_finance::types::{DcaConfig, UpcomingSwapResponse};
 
@@ -68,10 +67,11 @@ pub fn instantiate(
         platform_wallet: msg.platform_wallet,
         platform_fee: msg.platform_fee,
         croncat_task_hash: Option::None,
+        use_croncat: msg.use_croncat,
     };
 
     // ask croncat to start executing these tasks
-    let croncat_msg = construct_croncat_task_init(&info, &env, &config)?;
+    let croncat_msg = construct_croncat_task_init(deps.as_ref(), &info, &env, &config)?;
 
     CONFIG.save(deps.storage, &config)?;
 

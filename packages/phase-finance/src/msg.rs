@@ -27,6 +27,7 @@ pub struct InstantiateMsg {
     pub destinations: Vec<CoinWeight>,
     pub platform_wallet: Addr,
     pub platform_fee: Uint128,
+    pub use_croncat: bool,
 }
 
 #[cw_serde]

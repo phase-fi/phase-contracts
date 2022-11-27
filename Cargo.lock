@@ -754,6 +754,7 @@ version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
+ "cron_schedule",
  "cw-croncat-core",
  "thiserror",
 ]

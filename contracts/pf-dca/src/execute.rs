@@ -1,14 +1,11 @@
 use cosmwasm_std::{
-    to_binary, BankMsg, Coin, Decimal, DepsMut, Env, MessageInfo, Response, SubMsg,
-    WasmMsg,
+    to_binary, BankMsg, Coin, Decimal, DepsMut, Env, MessageInfo, Response, SubMsg, WasmMsg,
 };
 use cw_asset::Asset;
 use phase_finance::constants::{APOLLO_ROUTER_ADDRESS, DCA_SWAP_ID};
+use phase_finance::error::ContractError;
 
-use crate::{
-    state::CONFIG,
-    ContractError,
-};
+use crate::state::CONFIG;
 
 pub fn try_cancel_dca(
     deps: DepsMut,

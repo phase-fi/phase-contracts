@@ -1,14 +1,16 @@
-use cosmwasm_std::{coins, from_binary, Addr, BankMsg, CosmosMsg, Decimal, Uint128, WasmMsg, AllBalanceResponse, Coin};
 use cosmwasm_std::testing::{
     mock_dependencies, mock_dependencies_with_balance, mock_env, mock_info,
+};
+use cosmwasm_std::{
+    coins, from_binary, Addr, AllBalanceResponse, BankMsg, Coin, CosmosMsg, Decimal, Uint128,
+    WasmMsg,
 };
 
 use phase_finance::types::{CoinWeight, StrategyType};
 
-use crate::contract::{instantiate, execute, query};
+use crate::contract::{execute, instantiate, query};
 use crate::state::BONDED_BALANCES;
-use phase_finance::msg::{InstantiateMsg, ExecuteMsg, QueryMsg};
-
+use phase_finance::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 
 #[test]
 fn proper_initialization() {
@@ -25,6 +27,7 @@ fn proper_initialization() {
         cron: "* * 1 * *".to_string(),
         platform_wallet: Addr::unchecked("osmo123".to_string()),
         platform_fee: Uint128::zero(),
+        use_croncat: false,
     };
 
     let info = mock_info("creator", &coins(100, "uion"));
@@ -48,6 +51,7 @@ fn proper_execution() {
         cron: "* * 1 * *".to_string(),
         platform_wallet: Addr::unchecked("osmo123".to_string()),
         platform_fee: Uint128::zero(),
+        use_croncat: false,
     };
 
     let info = mock_info("osmo123", &coins(100, "uion"));
@@ -108,6 +112,7 @@ fn proper_cancel() {
         cron: "* * 1 * *".to_string(),
         platform_wallet: Addr::unchecked("osmoabc".to_string()),
         platform_fee: Uint128::zero(),
+        use_croncat: false,
     };
 
     let info = mock_info("osmo123", &coins(100, "uion"));
@@ -149,6 +154,7 @@ fn dont_cancel_if_unauthorized() {
         cron: "* * 1 * *".to_string(),
         platform_wallet: Addr::unchecked("osmo123".to_string()),
         platform_fee: Uint128::zero(),
+        use_croncat: false,
     };
 
     let info = mock_info("osmo123", &coins(100, "uion"));
@@ -171,13 +177,25 @@ fn dont_cancel_if_unauthorized() {
 fn query_handler_bonded_funds() {
     let mut deps = mock_dependencies();
 
-    let res: AllBalanceResponse = from_binary(&query(deps.as_ref(), mock_env(), QueryMsg::GetBondedFunds).unwrap()).unwrap();
+    let res: AllBalanceResponse =
+        from_binary(&query(deps.as_ref(), mock_env(), QueryMsg::GetBondedFunds).unwrap()).unwrap();
 
     assert_eq!(res, AllBalanceResponse { amount: vec![] });
 
-    BONDED_BALANCES.save(deps.as_mut().storage, "osmos".to_string(), &Uint128::MAX).unwrap();
+    BONDED_BALANCES
+        .save(deps.as_mut().storage, "osmos".to_string(), &Uint128::MAX)
+        .unwrap();
 
-    let res: AllBalanceResponse = from_binary(&query(deps.as_ref(), mock_env(), QueryMsg::GetBondedFunds).unwrap()).unwrap();
+    let res: AllBalanceResponse =
+        from_binary(&query(deps.as_ref(), mock_env(), QueryMsg::GetBondedFunds).unwrap()).unwrap();
 
-    assert_eq!(res, AllBalanceResponse { amount: vec![Coin { amount: Uint128::MAX, denom: "osmos".to_string() }] });
+    assert_eq!(
+        res,
+        AllBalanceResponse {
+            amount: vec![Coin {
+                amount: Uint128::MAX,
+                denom: "osmos".to_string()
+            }]
+        }
+    );
 }

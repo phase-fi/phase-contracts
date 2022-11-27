@@ -13,8 +13,14 @@ pub struct DcaConfig {
     pub source: Coin,
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
-    pub platform_wallet: Addr,
+    
+    // platform fee (configurable by caller)
     pub platform_fee: Uint128,
+    // platform fee recipient (configurable by caller)
+    pub platform_wallet: Addr,
+
+    // croncat config
+    pub use_croncat: bool,
     pub croncat_task_hash: Option<String>,
 }
 

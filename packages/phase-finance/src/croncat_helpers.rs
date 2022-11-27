@@ -1,34 +1,75 @@
+use std::str::FromStr;
+
 use cosmwasm_std::{
-    to_binary, Env, MessageInfo, StdError, StdResult, SubMsgResponse, WasmMsg, Deps,
+    to_binary, Deps, Env, MessageInfo, StdError, StdResult, SubMsgResponse, Timestamp, WasmMsg,
 };
 use cosmwasm_std::{Coin, Uint128};
-use cw_croncat_core::msg::TaskResponse;
+use cw_croncat_core::msg::{GetConfigResponse, TaskResponse};
 use cw_croncat_core::types::Action;
 
 use crate::constants::CRONCAT_CONTRACT_ADDR;
 use crate::msg::ExecuteMsg;
 use crate::types::DcaConfig;
 
-pub fn estimate_croncat_funding(_coin: Vec<Coin>, config: &DcaConfig) -> Vec<Coin> {
-    vec![Coin {
-        amount: config.num_trades * Uint128::from(10866u128),
-        denom: config.source.denom.clone(),
-    }]
+pub fn get_croncat_config(deps: Deps) -> StdResult<GetConfigResponse> {
+    let croncat_config_query = cw_croncat_core::msg::QueryMsg::GetConfig {};
+    let croncat_config: GetConfigResponse = deps.querier.query(
+        &cosmwasm_std::WasmQuery::Smart {
+            contract_addr: CRONCAT_CONTRACT_ADDR.to_string(),
+            msg: to_binary(&croncat_config_query)?,
+        }
+        .into(),
+    )?;
+
+    Ok(croncat_config)
+}
+
+pub fn calculate_croncat_funding(deps: Deps, num_trades:Uint128) -> StdResult<Vec<Coin>> {
+    // get num_trades and
+    let croncat_config = get_croncat_config(deps)?;
+
+    // this is completely fucking wrong
+    let croncat_fee = croncat_config.agent_fee.amount
+        + Uint128::from(croncat_config.gas_price) * num_trades;
+
+    Ok(vec![Coin {
+        denom: croncat_config.agent_fee.denom,
+        amount: croncat_fee,
+    }])
+    // vec![Coin {
+    //     amount: config.num_trades * Uint128::from(10866u128),
+    //     denom: config.source.denom.clone(),
+    // }]
 }
 
 pub fn construct_croncat_task_init(
+    deps: Deps,
     info: &MessageInfo,
     env: &Env,
     config: &DcaConfig,
 ) -> Result<WasmMsg, StdError> {
-    let croncat_funding = estimate_croncat_funding(info.funds.clone(), config);
+    let croncat_funding = calculate_croncat_funding(deps, config.num_trades)?;
+
+    let cron_schedule = cron_schedule::Schedule::from_str(&config.cron).unwrap();
+    let execution_times = cron_schedule
+        .upcoming()
+        .take((config.num_trades.u128() as usize) + 1)
+        .collect::<Vec<u64>>();
+
+    // we add one to the take above to skip the very first execution time but still have num_trades executions
+    let start_time = execution_times[1];
+    let end_time = execution_times[execution_times.len() - 1];
 
     Ok(WasmMsg::Execute {
         contract_addr: CRONCAT_CONTRACT_ADDR.to_string(),
         msg: to_binary(&cw_croncat_core::msg::ExecuteMsg::CreateTask {
             task: cw_croncat_core::msg::TaskRequest {
                 interval: cw_croncat_core::types::Interval::Cron(config.cron.clone()),
-                boundary: Option::None, // todo: set boundary for when job expires i guess (can also customize start time)
+                boundary: Option::Some(cw_croncat_core::types::Boundary::Time {
+                    start: Option::Some(Timestamp::from_nanos(start_time)),
+                    end: Option::Some(Timestamp::from_nanos(end_time)),
+                }),
+                // Option::None, // todo: set boundary for when job expires i guess (can also customize start time)
                 stop_on_fail: false,
                 actions: vec![Action {
                     msg: WasmMsg::Execute {
@@ -76,7 +117,7 @@ pub fn extract_croncat_task_hash(reply_msg: SubMsgResponse) -> StdResult<String>
     }
 }
 
-pub fn get_croncat_task(deps: Deps, croncat_task_hash: String) -> StdResult<TaskResponse>{
+pub fn get_croncat_task(deps: Deps, croncat_task_hash: String) -> StdResult<TaskResponse> {
     let task_query = cw_croncat_core::msg::QueryMsg::GetTask {
         task_hash: croncat_task_hash,
     };

@@ -49,6 +49,7 @@ mod tests {
             cron: "* * 1 * *".to_string(),
             platform_wallet: Addr::unchecked("osmo123".to_string()),
             platform_fee: Uint128::zero(),
+            use_croncat: false,
         };
         let _cw_template_contract_addr = app
             .instantiate_contract(
