@@ -1,10 +1,9 @@
 use cosmwasm_schema::{cw_serde, schemars::Map};
 use cosmwasm_std::{Addr, Coin, Env, Uint128};
-use cw_croncat_core::types::SlotType;
 
 #[cw_serde]
 pub struct DcaConfig {
-    pub strategy_creator: Addr,
+    pub owner: String,
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
     pub num_trades: Uint128,
@@ -13,14 +12,11 @@ pub struct DcaConfig {
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
 
-    // platform fee (configurable by caller)
+    // platform fee (configurable by initializer)
     pub platform_fee: Uint128,
-    // platform fee recipient (configurable by caller)
-    pub platform_wallet: Addr,
-
-    // croncat config
-    pub use_croncat: bool,
-    pub croncat_task_hash: Option<String>,
+    // platform fee recipient (configurable by initializer)
+    pub platform_wallet: Option<String>,
+    // croncat to be added once their contracts are on mainnet
 }
 
 #[cw_serde]
@@ -40,8 +36,15 @@ pub struct CoinWeight {
 
 #[cw_serde]
 pub struct UpcomingSwapResponse {
-    pub next: Uint128,
-    pub slot_type: SlotType,
+    pub pending_swap: Option<u64>,
+    pub can_execute: bool,
+}
+
+#[cw_serde]
+pub struct State {
+    pub pending_swap: Option<u64>,
+    pub paused: bool,
+    pub num_trades_executed: Uint128,
 }
 
 #[cw_serde]
@@ -55,7 +58,7 @@ pub struct SwapEvent {
     // the  timestamp for which this swap is scheduled
     pub timestamp_nanos: u64, // here we add other necessary info whenever swaps happen.
     // the actual timestamp for when this swap was executed, will be 0 if not executed yet
-    pub effective_timestamp_nanos: u64
+    pub effective_timestamp_nanos: u64,
 }
 
 #[cw_serde]

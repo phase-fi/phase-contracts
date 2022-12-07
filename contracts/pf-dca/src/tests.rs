@@ -178,7 +178,7 @@ fn query_handler_bonded_funds() {
     let mut deps = mock_dependencies();
 
     let res: AllBalanceResponse =
-        from_binary(&query(deps.as_ref(), mock_env(), QueryMsg::GetBondedFunds).unwrap()).unwrap();
+        from_binary(&query(deps.as_ref(), mock_env(), QueryMsg::GetSourceFunds).unwrap()).unwrap();
 
     assert_eq!(res, AllBalanceResponse { amount: vec![] });
 
@@ -187,7 +187,7 @@ fn query_handler_bonded_funds() {
         .unwrap();
 
     let res: AllBalanceResponse =
-        from_binary(&query(deps.as_ref(), mock_env(), QueryMsg::GetBondedFunds).unwrap()).unwrap();
+        from_binary(&query(deps.as_ref(), mock_env(), QueryMsg::GetSourceFunds).unwrap()).unwrap();
 
     assert_eq!(
         res,

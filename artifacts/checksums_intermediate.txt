@@ -1,2 +1,0 @@
-9b91f5180216cfe0c873c78be9144f6ba2f87a257496cde90322c78cac945104  ./target/wasm32-unknown-unknown/release/pf_dca.wasm
-c3231bfcaaa248bda3c8a762c35f5f778e1e4f319b93eef3882e7a9c6a0fde93  ./target/wasm32-unknown-unknown/release/pf_factory.wasm
