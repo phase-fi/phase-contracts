@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use cosmwasm_std::{AllBalanceResponse, Coin, Deps, Env, StdResult};
+use cosmwasm_std::{Coin, Deps, Env, StdResult};
 use phase_finance::types::{UpcomingSwapResponse, DcaConfig, State};
 
 use crate::{

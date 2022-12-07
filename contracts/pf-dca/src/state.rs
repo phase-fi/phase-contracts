@@ -1,6 +1,6 @@
 use cosmwasm_std::Uint128;
 use cw_storage_plus::{Item, Map};
-use phase_finance::types::{DcaConfig, DcaRecord, SwapEvent, State};
+use phase_finance::types::{DcaConfig, State};
 
 // struct SubmitOrder {
 //     address inToken;

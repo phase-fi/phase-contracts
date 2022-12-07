@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, schemars::Map};
-use cosmwasm_std::{Addr, Coin, Env, Uint128};
+use cosmwasm_std::{Coin, Env, Uint128};
 
 #[cw_serde]
 pub struct DcaConfig {

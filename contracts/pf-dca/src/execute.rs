@@ -1,10 +1,10 @@
 use cosmwasm_std::{
-    to_binary, BankMsg, Coin, Decimal, DepsMut, Env, MessageInfo, Response, SubMsg, Uint128,
+    to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg, Uint128,
     WasmMsg,
 };
 
 use cw_asset::AssetInfoBase;
-use cw_dex_router::operations::{SwapOperationsList, SwapOperationsListUnchecked};
+use cw_dex_router::operations::{SwapOperationsList};
 use phase_finance::constants::DCA_SWAP_ID;
 use phase_finance::error::ContractError;
 
@@ -41,7 +41,7 @@ pub fn try_cancel_dca(
 pub fn pause_dca(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
     let config = CONFIG.load(deps.storage)?;
 
-    if (info.sender != config.owner) {
+    if info.sender != config.owner {
         return Err(ContractError::Unauthorized {});
     }
 
@@ -58,7 +58,7 @@ pub fn resume_dca(deps: DepsMut, info: MessageInfo) -> Result<Response, Contract
     let config = CONFIG.load(deps.storage)?;
     let state = STATE.load(deps.storage)?;
 
-    if (info.sender != config.owner) {
+    if info.sender != config.owner {
         return Err(ContractError::Unauthorized {});
     }
 
@@ -88,7 +88,7 @@ pub fn try_perform_dca(
     let config = CONFIG.load(deps.storage)?;
     let state = STATE.load(deps.storage)?;
 
-    if (state.paused) {
+    if state.paused {
         return Err(ContractError::DcaPaused {});
     }
 
@@ -99,7 +99,7 @@ pub fn try_perform_dca(
         });
     }
 
-    let balance = deps
+    let _balance = deps
         .querier
         .query_balance(env.contract.address, config.source.denom.clone())?;
 

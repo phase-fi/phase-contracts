@@ -1,17 +1,16 @@
-#[cfg(not(feature = "library"))]
-use cosmwasm_schema::schemars::Map;
+
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, AllBalanceResponse, Binary, Coin, Deps, DepsMut, Env, MessageInfo, Reply, Response,
-    StdError, StdResult, SubMsg, SubMsgResponse, Uint128,
+    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response,
+    StdError, StdResult, Uint128,
 };
 use cw2::set_contract_version;
-use std::str::FromStr;
+
 
 use phase_finance::constants::DCA_SWAP_ID;
 
 use crate::execute::{pause_dca, resume_dca, try_cancel_dca, try_perform_dca};
-use crate::helpers::{can_execute, get_next_swap_time};
+use crate::helpers::{get_next_swap_time};
 use crate::query::{
     query_all_upcoming_swaps, query_bonded_funds, query_config, query_funds, query_state,
     query_upcoming_swap,
@@ -20,7 +19,7 @@ use crate::state::{CONFIG, STATE};
 
 use phase_finance::error::ContractError;
 use phase_finance::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-use phase_finance::types::{DcaConfig, DcaRecord, State, SwapEvent, UpcomingSwapResponse};
+use phase_finance::types::{DcaConfig, State};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:phase-finance";
@@ -29,7 +28,7 @@ const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
     deps: DepsMut,
-    env: Env,
+    _env: Env,
     info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
@@ -118,7 +117,7 @@ pub fn execute(
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
+pub fn reply(_deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
     match msg.id {
         DCA_SWAP_ID => match msg.result {
             cosmwasm_std::SubMsgResult::Ok(_reply_msg) => {

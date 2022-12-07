@@ -1,4 +1,4 @@
-use cosmwasm_std::{Deps, DepsMut, Env};
+use cosmwasm_std::{Env};
 use phase_finance::types::{DcaConfig, State};
 use std::str::FromStr;
 
