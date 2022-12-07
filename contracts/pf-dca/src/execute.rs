@@ -1,10 +1,9 @@
 use cosmwasm_std::{
-    to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg, Uint128,
-    WasmMsg,
+    to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg, Uint128, WasmMsg,
 };
 
 use cw_asset::AssetInfoBase;
-use cw_dex_router::operations::{SwapOperationsList};
+use cw_dex_router::operations::SwapOperationsList;
 use phase_finance::constants::DCA_SWAP_ID;
 use phase_finance::error::ContractError;
 
@@ -99,32 +98,10 @@ pub fn try_perform_dca(
         });
     }
 
-    let _balance = deps
-        .querier
-        .query_balance(env.contract.address, config.source.denom.clone())?;
-
-    // let in_funds = vec![Coin {
-    //     denom: config.source.denom.clone(),
-    //     amount: config.amount_per_trade,
-    // }];
-
-    // let to_assets = config
-    //     .destinations
-    //     .iter()
-    //     .map(|d| Asset {
-    //         amount: d.weight,
-    //         info: cw_asset::AssetInfoBase::Native(d.denom.clone()),
-    //     })
-    //     .collect();
-
-    // amount: config.amount_per_trade,
-    //
-    // amount: d
-    //                 .weight
-    //                 .checked_mul(config.amount_per_trade)
-    //                 .unwrap()
-    //                 .checked_div(total_weight)
-    //                 .unwrap(),
+    // todo: balance checks here?
+    // let _balance = deps
+    //     .querier
+    //     .query_balance(env.contract.address, config.source.denom.clone())?;
 
     let total_weight = config
         .destinations
@@ -179,11 +156,7 @@ pub fn try_perform_dca(
         })
         .collect();
 
-    // deps.querier.query_wasm_smart(config.router_contract, cw_dex_router::msg::QueryMsg::PathForPair { offer_asset: (), ask_asset: () })
-
-    // let swapOperations = SwapOperationsListUnchecked::new(vec![]);
-
-    // add the message to swap & send funds to user
+    // add the messages to swap & send funds to user
     Ok(Response::new()
         .add_submessages(msgs)
         .add_attribute("method", "try_perform_dca"))

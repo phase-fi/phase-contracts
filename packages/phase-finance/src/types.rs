@@ -47,6 +47,9 @@ pub struct State {
     pub pending_swap: Option<u64>,
     pub paused: bool,
     pub num_trades_executed: Uint128,
+
+    // for collecting all swaps in the reply handler and incrementing DCA pending swap
+    pub swap_status: Option<Vec<SwapEvent>>,
 }
 
 #[cw_serde]
@@ -56,43 +59,7 @@ pub struct SwapEvent {
     // the source token denom and the amount_per_trade amount
     pub token_in: Coin,
     // will be empty if the swap failed or didnt happen yet
-    pub effective_tokens_out: Vec<Coin>,
+    pub effective_token_out: Coin,
     // the  timestamp for which this swap is scheduled
     pub timestamp_nanos: u64, // here we add other necessary info whenever swaps happen.
-    // the actual timestamp for when this swap was executed, will be 0 if not executed yet
-    pub effective_timestamp_nanos: u64,
-}
-
-#[cw_serde]
-pub struct DcaRecord {
-    pub swap_events: Map<u64, SwapEvent>,
-}
-
-impl DcaRecord {
-    pub fn get_last_swap_event(&self, env: &Env) -> Option<&SwapEvent> {
-        let now = env.block.time;
-
-        let mut last_swap_event = Option::None;
-        for (swap_event_timestamp, value) in self.swap_events.iter() {
-            // update last swap event if it happened in the past
-            if swap_event_timestamp < &now.nanos() {
-                last_swap_event = Some(value);
-            }
-        }
-
-        last_swap_event
-    }
-
-    pub fn get_next_swap_event(&self, env: &Env) -> Option<&SwapEvent> {
-        let now = env.block.time;
-
-        for (swap_event_timestamp, value) in self.swap_events.iter() {
-            // return as soon as we find a swap event in the future
-            if swap_event_timestamp > &now.nanos() {
-                return Some(value);
-            }
-        }
-
-        return Option::None;
-    }
 }

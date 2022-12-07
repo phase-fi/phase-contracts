@@ -1,16 +1,14 @@
-
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response,
-    StdError, StdResult, Uint128,
+    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdError, StdResult,
+    Uint128,
 };
 use cw2::set_contract_version;
-
 
 use phase_finance::constants::DCA_SWAP_ID;
 
 use crate::execute::{pause_dca, resume_dca, try_cancel_dca, try_perform_dca};
-use crate::helpers::{get_next_swap_time};
+use crate::helpers::get_next_swap_time;
 use crate::query::{
     query_all_upcoming_swaps, query_bonded_funds, query_config, query_funds, query_state,
     query_upcoming_swap,
@@ -87,6 +85,7 @@ pub fn instantiate(
         pending_swap: Option::None,
         paused: false,
         num_trades_executed: Uint128::zero(),
+        swap_status: Option::None,
     };
 
     let next_execution_time = get_next_swap_time(&config, &state);
@@ -118,6 +117,24 @@ pub fn execute(
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn reply(_deps: DepsMut, _env: Env, msg: Reply) -> StdResult<Response> {
+    // reply handler psuedocode
+    // match msg.id
+    // in case of DCA_SWAP_ID
+    // in case of OK -> extract swap details (source asset amount, destination asset amount, destination amount denom, swap timestamp)
+    // in case of err -> extract attempted destination amount denom, timestamp, etc
+    // save swap_status with a new swapEvent into state
+    // check if swap_status has the same length as config.destinations
+    // if it does, then send all the successfully swapped into coins to the owner
+    // if it doesn't, do nothing
+    // update state with
+    // state = State {
+    //     pending_swap: get_next_swap_time(&config, &state)
+    //     paused: false,
+    //     num_trades_executed: state.num_trades_executed + 1,
+    //     swap_status: Option::None,
+    // };
+    // add response with all attributes of the swap events
+
     match msg.id {
         DCA_SWAP_ID => match msg.result {
             cosmwasm_std::SubMsgResult::Ok(_reply_msg) => {
