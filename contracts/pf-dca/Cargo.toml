@@ -9,17 +9,6 @@ edition = "2021"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
-[profile.release]
-opt-level = 3
-debug = false
-rpath = false
-lto = true
-debug-assertions = false
-codegen-units = 1
-panic = 'abort'
-incremental = false
-overflow-checks = true
-
 [features]
 # for more explicit tests, cargo test --features=backtraces
 backtraces = ["cosmwasm-std/backtraces"]
@@ -43,10 +32,10 @@ osmosis-std = "0.1.7"
 strum = "0.24.1"
 strum_macros = "0.24.2"
 thiserror = { version = "1.0.37" }
-cw-asset = "2.3.0"
-cw-croncat-core = { git = "https://github.com/njerschow/cw-croncat.git" }
-apollo-router = { path = "../../packages/apollo-router" }
+cw-asset = { git="https://github.com/apollodao/cw-asset.git", rev = "5e51773da42ef82faa67576454e8c4b0971097f2" }
 phase-finance = { path = "../../packages/phase-finance" }
+cron_schedule = "0.2.2"
+cw-dex-router = { git = "https://github.com/apollodao/cw-dex-router.git", feature = "library" }
 
 [dev-dependencies]
 cw-multi-test = "0.13.2"

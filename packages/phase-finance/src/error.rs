@@ -12,8 +12,11 @@ pub enum ContractError {
     #[error("No balance")]
     NoBalance {},
 
-    #[error("No task hash")]
-    NoTaskHash {},
+    #[error("DCA swap not allowed yet, next swap will be executable at {next_swap_event_time:?}")]
+    DcaSwapNotAllowedYet { next_swap_event_time: u64 },
+
+    #[error("DCA strategy is paused")]
+    DcaPaused {},
 
     #[error("Custom Error val: {val:?}")]
     CustomError { val: String },

@@ -1,0 +1,14 @@
+{
+    "amount_per_trade": "1",
+    "cron": "1 * * * * *",
+    "destinations": [
+        {
+            "denom": "juno",
+            "weight": "1"
+        }
+    ],
+    "num_trades": "5",
+    "platform_fee": "0",
+    "platform_wallet": "osmo1pwyl8cg7wskhvsl8hwmu20j0j2qcf52k2vph8w",
+    "strategy_type": "linear"
+}

@@ -1,7 +1,7 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Addr, Coin, Uint128};
+use cosmwasm_std::{AllBalanceResponse, Coin, Uint128};
 
-use phase_finance::types::{CoinWeight, StrategyType};
+use crate::types::{CoinWeight, DcaConfig, State, StrategyType, UpcomingSwapResponse};
 
 // Execute:
 // create/instantiate: Both collab
@@ -25,8 +25,11 @@ pub struct InstantiateMsg {
     pub cron: String,
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
-    pub platform_wallet: Addr,
+
     pub platform_fee: Uint128,
+    pub platform_wallet: Option<String>,
+
+    pub router_contract: String,
 }
 
 #[cw_serde]
@@ -42,25 +45,28 @@ pub enum ExecuteMsg {
     // claim deposited funds (this will also claim unbonded funds when yield strategies are added)
     // no need to claim funds on the destinations since those should be sent to the users
     // wallet after every DCA step
-    ClaimFunds {},
+    // ClaimFunds {},
 }
 
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
     // get the next swap that will be performed
-    #[returns(())]
+    #[returns(UpcomingSwapResponse)]
     GetUpcomingSwap {},
     // get all upcoming swaps
-    #[returns(())]
+    #[returns(Vec<UpcomingSwapResponse>)]
     GetAllUpcomingSwaps {},
     // get the amount of funds that are bonded
-    #[returns(Coin)]
-    GetBondedFunds {},
+    #[returns(AllBalanceResponse)]
+    GetSourceFunds,
     // get the amount of funds that are claimable
     #[returns(Vec<Coin>)]
-    GetClaimableFunds {},
+    GetAllFunds {},
     // get the strategy config
-    #[returns(())]
-    GetStrategyConfig {},
+    #[returns(DcaConfig)]
+    Config {},
+    // get the strategy state
+    #[returns(State)]
+    State {},
 }

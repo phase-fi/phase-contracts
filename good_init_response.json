@@ -1,0 +1,157 @@
+[
+    {
+        "events": [
+            {
+                "type": "coin_received",
+                "attributes": [
+                    {
+                        "key": "receiver",
+                        "value": "osmo1e58pmg0z9r8eums0mpxcqzx7sla9z875rdd2wg77wdtxa7nk9amq6w4csx"
+                    },
+                    {
+                        "key": "amount",
+                        "value": "54330uosmo"
+                    },
+                    {
+                        "key": "amount",
+                        "value": "54330uosmo"
+                    },
+                    {
+                        "key": "receiver",
+                        "value": "osmo1gydw3jdmhye7qzj80xesz457llhx4djhsf99m82xaq63e0yjfsaqafsy6v"
+                    }
+                ]
+            },
+            {
+                "type": "coin_spent",
+                "attributes": [
+                    {
+                        "key": "spender",
+                        "value": "osmo1furt7dtl3ss9qpa9c0t8e6wkh3q3pehge5nvnf"
+                    },
+                    {
+                        "key": "amount",
+                        "value": "54330uosmo"
+                    },
+                    {
+                        "key": "amount",
+                        "value": "54330uosmo"
+                    },
+                    {
+                        "key": "spender",
+                        "value": "osmo1e58pmg0z9r8eums0mpxcqzx7sla9z875rdd2wg77wdtxa7nk9amq6w4csx"
+                    }
+                ]
+            },
+            {
+                "type": "execute",
+                "attributes": [
+                    {
+                        "key": "_contract_address",
+                        "value": "osmo1gydw3jdmhye7qzj80xesz457llhx4djhsf99m82xaq63e0yjfsaqafsy6v"
+                    }
+                ]
+            },
+            {
+                "type": "instantiate",
+                "attributes": [
+                    {
+                        "key": "_contract_address",
+                        "value": "osmo1e58pmg0z9r8eums0mpxcqzx7sla9z875rdd2wg77wdtxa7nk9amq6w4csx"
+                    },
+                    {
+                        "key": "code_id",
+                        "value": "3897"
+                    }
+                ]
+            },
+            {
+                "type": "message",
+                "attributes": [
+                    {
+                        "key": "action",
+                        "value": "/cosmwasm.wasm.v1.MsgInstantiateContract"
+                    },
+                    {
+                        "key": "module",
+                        "value": "wasm"
+                    },
+                    {
+                        "key": "sender",
+                        "value": "osmo1furt7dtl3ss9qpa9c0t8e6wkh3q3pehge5nvnf"
+                    }
+                ]
+            },
+            {
+                "type": "transfer",
+                "attributes": [
+                    {
+                        "key": "recipient",
+                        "value": "osmo1e58pmg0z9r8eums0mpxcqzx7sla9z875rdd2wg77wdtxa7nk9amq6w4csx"
+                    },
+                    {
+                        "key": "sender",
+                        "value": "osmo1furt7dtl3ss9qpa9c0t8e6wkh3q3pehge5nvnf"
+                    },
+                    {
+                        "key": "amount",
+                        "value": "54330uosmo"
+                    },
+                    {
+                        "key": "amount",
+                        "value": "54330uosmo"
+                    },
+                    {
+                        "key": "recipient",
+                        "value": "osmo1gydw3jdmhye7qzj80xesz457llhx4djhsf99m82xaq63e0yjfsaqafsy6v"
+                    },
+                    {
+                        "key": "sender",
+                        "value": "osmo1e58pmg0z9r8eums0mpxcqzx7sla9z875rdd2wg77wdtxa7nk9amq6w4csx"
+                    }
+                ]
+            },
+            {
+                "type": "wasm",
+                "attributes": [
+                    {
+                        "key": "_contract_address",
+                        "value": "osmo1e58pmg0z9r8eums0mpxcqzx7sla9z875rdd2wg77wdtxa7nk9amq6w4csx"
+                    },
+                    {
+                        "key": "method",
+                        "value": "instantiate"
+                    },
+                    {
+                        "key": "creator",
+                        "value": "osmo1furt7dtl3ss9qpa9c0t8e6wkh3q3pehge5nvnf"
+                    },
+                    {
+                        "key": "_contract_address",
+                        "value": "osmo1gydw3jdmhye7qzj80xesz457llhx4djhsf99m82xaq63e0yjfsaqafsy6v"
+                    },
+                    {
+                        "key": "method",
+                        "value": "create_task"
+                    },
+                    {
+                        "key": "slot_id",
+                        "value": "1668648000000000000"
+                    },
+                    {
+                        "key": "slot_kind",
+                        "value": "Cron"
+                    },
+                    {
+                        "key": "task_hash",
+                        "value": "bfe8fb20469f71a32a7976e0c8c8d1a317417cc60da83a1e063f749e7b2734f3"
+                    },
+                    {
+                        "key": "with_rules",
+                        "value": "false"
+                    }
+                ]
+            }
+        ]
+    }
+]
