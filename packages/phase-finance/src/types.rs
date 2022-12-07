@@ -16,6 +16,8 @@ pub struct DcaConfig {
     pub platform_fee: Uint128,
     // platform fee recipient (configurable by initializer)
     pub platform_wallet: Option<String>,
+
+    pub router_contract: String,
     // croncat to be added once their contracts are on mainnet
 }
 

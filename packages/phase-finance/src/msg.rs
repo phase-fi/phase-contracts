@@ -28,6 +28,8 @@ pub struct InstantiateMsg {
 
     pub platform_fee: Uint128,
     pub platform_wallet: Option<String>,
+
+    pub router_contract: String,
 }
 
 #[cw_serde]

@@ -81,6 +81,7 @@ pub fn instantiate(
         cron: msg.cron.clone(),
         platform_wallet: msg.platform_wallet,
         platform_fee: msg.platform_fee,
+        router_contract: msg.router_contract,
     };
 
     let mut state = State {
