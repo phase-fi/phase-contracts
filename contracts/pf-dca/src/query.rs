@@ -70,9 +70,9 @@ pub fn query_funds(deps: Deps, env: Env) -> StdResult<Vec<Coin>> {
 
 
 pub fn query_config(deps: Deps) -> StdResult<DcaConfig> {
-    Ok(CONFIG.load(deps.storage))
+    CONFIG.load(deps.storage)
 }
 
 pub fn query_state(deps: Deps) -> StdResult<State> {
-    Ok(STATE.load(deps.storage))
+    STATE.load(deps.storage)
 }
