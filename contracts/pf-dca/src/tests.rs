@@ -2,7 +2,7 @@ use cosmwasm_std::testing::{
     mock_dependencies, mock_dependencies_with_balance, mock_env, mock_info,
 };
 use cosmwasm_std::{
-    coins, from_binary, Addr, AllBalanceResponse, BankMsg, Coin, CosmosMsg, Decimal, Uint128,
+    coins, from_binary, AllBalanceResponse, BankMsg, Coin, CosmosMsg, Uint128,
     WasmMsg,
 };
 
@@ -69,7 +69,7 @@ fn proper_execution() {
     assert_eq!(1, res.messages.len());
 
     // cast the first response message to a WasmMsg
-    let wasm_msg = match res.messages[0].clone().msg {
+    let _wasm_msg = match res.messages[0].clone().msg {
         CosmosMsg::Wasm(wasm_msg) => match wasm_msg {
             WasmMsg::Execute { msg, .. } => from_binary(&msg).unwrap(),
             _ => panic!("unexpected message"),
