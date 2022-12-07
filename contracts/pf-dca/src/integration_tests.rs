@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use phase_finance::types::{CoinWeight, StrategyType};
-    use phase_finance::msg::InstantiateMsg;
     use cosmwasm_std::{Addr, Coin, Empty, Uint128};
     use cw_multi_test::{App, AppBuilder, Contract, ContractWrapper, Executor};
+    use phase_finance::msg::InstantiateMsg;
+    use phase_finance::types::{CoinWeight, StrategyType};
 
     pub fn contract_template() -> Box<dyn Contract<Empty>> {
         let contract = ContractWrapper::new(
@@ -47,9 +47,9 @@ mod tests {
             amount_per_trade: Uint128::from(10u128),
             num_trades: Uint128::from(10u128),
             cron: "* * 1 * *".to_string(),
-            platform_wallet: Addr::unchecked("osmo123".to_string()),
+            platform_wallet: Option::Some("osmo123".to_string()),
             platform_fee: Uint128::zero(),
-            use_croncat: false,
+            router_contract: "osmoabc".to_string(),
         };
         let _cw_template_contract_addr = app
             .instantiate_contract(
@@ -62,6 +62,6 @@ mod tests {
             )
             .unwrap();
 
-         app
+        app
     }
 }
