@@ -21,12 +21,12 @@ pub fn try_cancel_dca(
     }
 
     let balances = deps.querier.query_all_balances(env.contract.address)?;
-    if balances.len() == 0 {
+    if balances.is_empty() {
         return Err(ContractError::NoBalance {});
     }
 
     let msg = BankMsg::Send {
-        to_address: config.owner.to_string(),
+        to_address: config.owner,
         amount: balances,
     };
 
