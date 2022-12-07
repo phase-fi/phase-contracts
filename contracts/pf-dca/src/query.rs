@@ -42,10 +42,10 @@ pub fn query_all_upcoming_swaps(deps: Deps, env: Env) -> StdResult<Vec<UpcomingS
 }
 
 pub fn query_bonded_funds(deps: Deps, env: Env) -> StdResult<Coin> {
-    Ok(deps.querier.query_balance(
+    deps.querier.query_balance(
         env.contract.address,
         CONFIG.load(deps.storage)?.source.denom,
-    )?)
+    )
 }
 
 pub fn query_funds(deps: Deps, env: Env) -> StdResult<Vec<Coin>> {
@@ -70,9 +70,9 @@ pub fn query_funds(deps: Deps, env: Env) -> StdResult<Vec<Coin>> {
 
 
 pub fn query_config(deps: Deps) -> StdResult<DcaConfig> {
-    Ok(CONFIG.load(deps.storage)?)
+    Ok(CONFIG.load(deps.storage))
 }
 
 pub fn query_state(deps: Deps) -> StdResult<State> {
-    Ok(STATE.load(deps.storage)?)
+    Ok(STATE.load(deps.storage))
 }
