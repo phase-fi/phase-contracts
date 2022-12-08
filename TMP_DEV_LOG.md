@@ -23,3 +23,29 @@ Currently if you are querying more than 5 minutes after the croncat instantiatio
 
 
 gas_base_fee + gas_action_fee*actiions.length
+
+
+## CW_DEX_ROUTER
+
+### Init route
+`osmosisd tx wasm execute osmo1fm349tq2lnwkmzcgwzkvwmvvrhskhk2cepfugxs5cnfsx3663xysdzh6qg '{"set_route": {"input_denom":"uosmo","output_denom":"uion","pool_route":[{"pool_id":"2","token_out_denom":"uion"}]}}' --from main`
+
+```
+{
+    "set_route": {
+        "input_denom": "uosmo",
+        "output_denom": "uion",
+        "pool_route": [
+            {
+                "pool_id": "2",
+                "token_out_denom": "uion"
+            }
+        ]
+    }
+}
+```
+
+### Swap
+
+`osmosisd tx wasm execute osmo1fm349tq2lnwkmzcgwzkvwmvvrhskhk2cepfugxs5cnfsx3663xysdzh6qg '{"swap": {"input_coin":{"denom":"uosmo","amount":"637870"},"output_denom":"uion","slipage":{"max_slipage_percentage":"0.9"}}}' --from main --amount 637870uosmo`
+#### thats one percent slippage^

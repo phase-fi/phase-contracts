@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg, Uint128, WasmMsg,
+    to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg, Uint128, WasmMsg, Decimal,
 };
 
 use cw_asset::AssetInfoBase;
@@ -113,23 +113,23 @@ pub fn try_perform_dca(
         .destinations
         .iter()
         .map(|d| {
-            let path_query = cw_dex_router::msg::QueryMsg::PathForPair {
-                offer_asset: source_asset.clone(),
-                ask_asset: AssetInfoBase::Native(d.denom.clone()),
-            };
+            // let path_query = cw_dex_router::msg::QueryMsg::PathForPair {
+            //     offer_asset: source_asset.clone(),
+            //     ask_asset: AssetInfoBase::Native(d.denom.clone()),
+            // };
 
-            let swap_operations_list: SwapOperationsList = deps
-                .querier
-                .query(
-                    &cosmwasm_std::WasmQuery::Smart {
-                        contract_addr: config.router_contract.clone(),
-                        msg: to_binary(&path_query).unwrap(),
-                    }
-                    .into(),
-                )
-                .unwrap();
+            // let swap_operations_list: SwapOperationsList = deps
+            //     .querier
+            //     .query(
+            //         &cosmwasm_std::WasmQuery::Smart {
+            //             contract_addr: config.router_contract.clone(),
+            //             msg: to_binary(&path_query).unwrap(),
+            //         }
+            //         .into(),
+            //     )
+            //     .unwrap();
 
-            let in_funds = vec![Coin {
+            let in_funds = Coin {
                 denom: config.source.denom.clone(),
                 amount: d
                     .weight
@@ -137,18 +137,12 @@ pub fn try_perform_dca(
                     .unwrap()
                     .checked_div(total_weight)
                     .unwrap(),
-            }];
+            };
 
-            let msg = WasmMsg::Execute {
-                contract_addr: config.router_contract.to_string(),
-                funds: in_funds,
-                msg: to_binary(&cw_dex_router::msg::ExecuteMsg::ExecuteSwapOperations {
-                    operations: swap_operations_list.into(),
-                    offer_amount: Option::None,    // needed for cw20s only
-                    minimum_receive: Option::None, // todo: add min receive, can be done by adding support for osmo twap
-                    to: Option::Some(config.owner.to_string()),
-                })
-                .unwrap(),
+            let msg = swaprouter::msg::ExecuteMsg::Swap {
+                input_coin: in_funds,
+                output_denom: d.denom,
+                slipage: swaprouter::msg::Slipage::MaxSlipagePercentage(Decimal::percent(1u64)) // 1% slipage, todo: configure from config
             };
 
             SubMsg::reply_always(msg, DCA_SWAP_ID)

@@ -32,10 +32,13 @@ osmosis-std = "0.1.7"
 strum = "0.24.1"
 strum_macros = "0.24.2"
 thiserror = { version = "1.0.37" }
-cw-asset = { git="https://github.com/apollodao/cw-asset.git", rev = "5e51773da42ef82faa67576454e8c4b0971097f2" }
+cw-asset = { git = "https://github.com/apollodao/cw-asset.git", rev = "5e51773da42ef82faa67576454e8c4b0971097f2" }
 phase-finance = { path = "../../packages/phase-finance" }
 cron_schedule = "0.2.2"
-cw-dex-router = { git = "https://github.com/apollodao/cw-dex-router.git", feature = "library" }
+swaprouter = { git = "https://github.com/osmosis-labs/swaprouter.git", rev = "736f8685f15fb53f069911d8d306123b1ac50fee", features = [
+  "library",
+] }
+chrono = { version = "0.4.22", default-features = false }
 
 [dev-dependencies]
 cw-multi-test = "0.13.2"
