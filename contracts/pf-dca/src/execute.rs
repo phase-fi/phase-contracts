@@ -1,9 +1,9 @@
 use cosmwasm_std::{
-    to_binary, BankMsg, Coin, CosmosMsg, Decimal, DepsMut, Env, MessageInfo, Response, SubMsg,
+    to_binary, BankMsg, Coin, Decimal, DepsMut, Env, MessageInfo, Response, SubMsg,
     Uint128, WasmMsg,
 };
 
-use cw_asset::AssetInfoBase;
+
 use phase_finance::constants::DCA_SWAP_ID;
 use phase_finance::error::ContractError;
 
