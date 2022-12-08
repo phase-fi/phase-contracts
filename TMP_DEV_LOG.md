@@ -47,5 +47,5 @@ gas_base_fee + gas_action_fee*actiions.length
 
 ### Swap
 
-`osmosisd tx wasm execute osmo1fm349tq2lnwkmzcgwzkvwmvvrhskhk2cepfugxs5cnfsx3663xysdzh6qg '{"swap": {"input_coin":{"denom":"uosmo","amount":"637870"},"output_denom":"uion","slipage":{"max_slipage_percentage":"0.9"}}}' --from main --amount 637870uosmo`
+`osmosisd tx wasm execute osmo1fm349tq2lnwkmzcgwzkvwmvvrhskhk2cepfugxs5cnfsx3663xysdzh6qg '{"swap": {"input_coin":{"denom":"uosmo","amount":"637870"},"output_denom":"uion","slippage":{"max_slippage_percentage":"99.999999999"}}}' --from main --amount 637870uosmo`
 #### thats one percent slippage^

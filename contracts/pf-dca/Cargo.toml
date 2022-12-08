@@ -35,8 +35,8 @@ thiserror = { version = "1.0.37" }
 cw-asset = { git = "https://github.com/apollodao/cw-asset.git", rev = "5e51773da42ef82faa67576454e8c4b0971097f2" }
 phase-finance = { path = "../../packages/phase-finance" }
 cron_schedule = "0.2.2"
-swaprouter = { git = "https://github.com/osmosis-labs/swaprouter.git", rev = "736f8685f15fb53f069911d8d306123b1ac50fee", features = [
-  "library",
+swaprouter = { path = "./../../../osmosis/x/ibc-hooks/contracts/swaprouter/", features = [
+  "imported",
 ] }
 chrono = { version = "0.4.22", default-features = false }
 
