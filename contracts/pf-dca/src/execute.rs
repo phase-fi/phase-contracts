@@ -1,9 +1,9 @@
 use cosmwasm_std::{
-    to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg, Uint128, WasmMsg,
+    to_binary, BankMsg, Coin, Decimal, DepsMut, Env, MessageInfo, Response, SubMsg,
+    Uint128, WasmMsg,
 };
 
-use cw_asset::AssetInfoBase;
-use cw_dex_router::operations::SwapOperationsList;
+
 use phase_finance::constants::DCA_SWAP_ID;
 use phase_finance::error::ContractError;
 
@@ -107,29 +107,13 @@ pub fn try_perform_dca(
         .iter()
         .fold(Uint128::zero(), |acc, d| acc + d.weight);
 
-    let source_asset = AssetInfoBase::Native(config.source.denom.clone());
 
     let msgs: Vec<SubMsg> = config
         .destinations
         .iter()
         .map(|d| {
-            let path_query = cw_dex_router::msg::QueryMsg::PathForPair {
-                offer_asset: source_asset.clone(),
-                ask_asset: AssetInfoBase::Native(d.denom.clone()),
-            };
 
-            let swap_operations_list: SwapOperationsList = deps
-                .querier
-                .query(
-                    &cosmwasm_std::WasmQuery::Smart {
-                        contract_addr: config.router_contract.clone(),
-                        msg: to_binary(&path_query).unwrap(),
-                    }
-                    .into(),
-                )
-                .unwrap();
-
-            let in_funds = vec![Coin {
+            let in_funds = Coin {
                 denom: config.source.denom.clone(),
                 amount: d
                     .weight
@@ -137,18 +121,19 @@ pub fn try_perform_dca(
                     .unwrap()
                     .checked_div(total_weight)
                     .unwrap(),
-            }];
+            };
 
             let msg = WasmMsg::Execute {
-                contract_addr: config.router_contract.to_string(),
-                funds: in_funds,
-                msg: to_binary(&cw_dex_router::msg::ExecuteMsg::ExecuteSwapOperations {
-                    operations: swap_operations_list.into(),
-                    offer_amount: Option::None,    // needed for cw20s only
-                    minimum_receive: Option::None, // todo: add min receive, can be done by adding support for osmo twap
-                    to: Option::Some(config.owner.to_string()),
+                contract_addr: config.router_contract.clone(),
+                msg: to_binary(&swaprouter::msg::ExecuteMsg::Swap {
+                    input_coin: in_funds.clone(),
+                    output_denom: d.denom.clone(),
+                    slippage: swaprouter::msg::Slippage::MaxSlippagePercentage(Decimal::percent(
+                        1u64,
+                    )), // 1% slippage, todo: configure from config
                 })
                 .unwrap(),
+                funds: vec![in_funds.clone()],
             };
 
             SubMsg::reply_always(msg, DCA_SWAP_ID)
