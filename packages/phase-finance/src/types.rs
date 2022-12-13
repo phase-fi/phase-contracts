@@ -49,7 +49,7 @@ pub struct State {
     pub num_trades_executed: Uint128,
 
     // for collecting all swaps in the reply handler and incrementing DCA pending swap
-    pub swap_status: Option<Vec<SwapEvent>>,
+    pub swap_status: Vec<SwapEvent>,
 }
 
 #[cw_serde]
@@ -57,9 +57,9 @@ pub struct SwapEvent {
     // whether or not the swap was executed yet
     pub executed: bool,
     // the source token denom and the amount_per_trade amount
-    pub token_in: Coin,
+    pub token_in: String,
     // will be empty if the swap failed or didnt happen yet
-    pub effective_token_out: Coin,
+    pub effective_token_out: String,
     // the  timestamp for which this swap is scheduled
     pub timestamp_nanos: u64, // here we add other necessary info whenever swaps happen.
 }
