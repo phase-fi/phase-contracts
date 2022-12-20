@@ -4,10 +4,11 @@ use cosmwasm_std::{Coin, Uint128};
 #[cw_serde]
 pub struct DcaConfig {
     pub owner: String,
+    pub destination_wallet: String,
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
     pub num_trades: Uint128,
-    pub cron: String,
+    pub swap_interval_nanos: u64,
     pub source: Coin,
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
@@ -38,18 +39,21 @@ pub struct CoinWeight {
 
 #[cw_serde]
 pub struct UpcomingSwapResponse {
-    pub pending_swap: Option<u64>,
+    pub pending_swap_time_nanos: Option<u64>,
     pub can_execute: bool,
 }
 
 #[cw_serde]
 pub struct State {
-    pub pending_swap: Option<u64>,
+    // epoch time in nanons of the earliest allowed time of the swap that is yet to be executed
+    pub pending_swap_time_nanos: Option<u64>,
+    // if the strategy is paused
     pub paused: bool,
+    // number of trades already executed (should never be more than config.num_trades)
     pub num_trades_executed: Uint128,
 
     // for collecting all swaps in the reply handler and incrementing DCA pending swap
-    pub swap_status: Option<Vec<SwapEvent>>,
+    pub swap_status: Vec<SwapEvent>,
 }
 
 #[cw_serde]
@@ -57,9 +61,9 @@ pub struct SwapEvent {
     // whether or not the swap was executed yet
     pub executed: bool,
     // the source token denom and the amount_per_trade amount
-    pub token_in: Coin,
+    pub token_in: Option<Coin>,
     // will be empty if the swap failed or didnt happen yet
-    pub effective_token_out: Coin,
+    pub effective_token_out: Option<Coin>,
     // the  timestamp for which this swap is scheduled
     pub timestamp_nanos: u64, // here we add other necessary info whenever swaps happen.
 }

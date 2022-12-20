@@ -1,7 +1,7 @@
-use std::str::FromStr;
+
 
 use cosmwasm_std::{Coin, Deps, Env, StdResult};
-use phase_finance::types::{UpcomingSwapResponse, DcaConfig, State};
+use phase_finance::types::{DcaConfig, State, UpcomingSwapResponse};
 
 use crate::{
     helpers::can_execute,
@@ -13,32 +13,21 @@ pub fn query_upcoming_swap(deps: Deps, env: Env) -> StdResult<UpcomingSwapRespon
     let state = STATE.load(deps.storage)?;
 
     Ok(UpcomingSwapResponse {
-        pending_swap: state.pending_swap,
+        pending_swap_time_nanos: state.pending_swap_time_nanos,
         can_execute: can_execute(&env, &config, &state),
     })
 }
 
 pub fn query_all_upcoming_swaps(deps: Deps, env: Env) -> StdResult<Vec<UpcomingSwapResponse>> {
-    let config = CONFIG.load(deps.storage)?;
-    let state = STATE.load(deps.storage)?;
+    let _config = CONFIG.load(deps.storage)?;
+    let _state = STATE.load(deps.storage)?;
 
-    let cron_schedule = cron_schedule::Schedule::from_str(&config.cron).unwrap();
-    let upcoming_swaps = cron_schedule
-        .upcoming()
-        // todo is this safe?
-        .skip(state.num_trades_executed.u128() as usize)
-        .take(config.num_trades.u128() as usize)
-        .collect::<Vec<u64>>();
+    // calculate (config.num_trades - state.num_trades_executed) upcoming swaps and add config.swap_interval_nanos to each subsequent swap
+    let upcoming_swaps: Vec<UpcomingSwapResponse> = Vec::new();
+    let _next_swap_time_nanos = env.block.time.nanos();
+    
 
-    upcoming_swaps
-        .iter()
-        .map(|swap| {
-            Ok(UpcomingSwapResponse {
-                pending_swap: Some(*swap),
-                can_execute: can_execute(&env, &config, &state),
-            })
-        })
-        .collect()
+    Ok(upcoming_swaps)
 }
 
 pub fn query_bonded_funds(deps: Deps, env: Env) -> StdResult<Coin> {
@@ -62,12 +51,13 @@ pub fn query_funds(deps: Deps, env: Env) -> StdResult<Vec<Coin>> {
         .querier
         .query_all_balances(env.contract.address)?
         .into_iter()
-        .filter(|coin| destination_denoms.contains(&coin.denom) || coin.denom == config.source.denom)
+        .filter(|coin| {
+            destination_denoms.contains(&coin.denom) || coin.denom == config.source.denom
+        })
         .collect();
 
     Ok(balances)
 }
-
 
 pub fn query_config(deps: Deps) -> StdResult<DcaConfig> {
     CONFIG.load(deps.storage)
