@@ -1,6 +1,6 @@
-use std::str::FromStr;
 
-use cosmwasm_std::{Coin, Deps, Env, StdResult, Uint128};
+
+use cosmwasm_std::{Coin, Deps, Env, StdResult};
 use phase_finance::types::{DcaConfig, State, UpcomingSwapResponse};
 
 use crate::{
@@ -19,12 +19,12 @@ pub fn query_upcoming_swap(deps: Deps, env: Env) -> StdResult<UpcomingSwapRespon
 }
 
 pub fn query_all_upcoming_swaps(deps: Deps, env: Env) -> StdResult<Vec<UpcomingSwapResponse>> {
-    let config = CONFIG.load(deps.storage)?;
-    let state = STATE.load(deps.storage)?;
+    let _config = CONFIG.load(deps.storage)?;
+    let _state = STATE.load(deps.storage)?;
 
     // calculate (config.num_trades - state.num_trades_executed) upcoming swaps and add config.swap_interval_nanos to each subsequent swap
-    let mut upcoming_swaps: Vec<UpcomingSwapResponse> = Vec::new();
-    let mut next_swap_time_nanos = env.block.time.nanos();
+    let upcoming_swaps: Vec<UpcomingSwapResponse> = Vec::new();
+    let _next_swap_time_nanos = env.block.time.nanos();
     
 
     Ok(upcoming_swaps)

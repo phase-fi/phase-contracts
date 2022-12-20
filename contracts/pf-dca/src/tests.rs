@@ -2,16 +2,16 @@ use cosmwasm_std::testing::{
     mock_dependencies, mock_dependencies_with_balance, mock_env, mock_info,
 };
 use cosmwasm_std::{
-    coins, from_binary, AllBalanceResponse, BankMsg, Coin, CosmosMsg, Uint128, WasmMsg,
+    coins, BankMsg, CosmosMsg, Uint128,
 };
 
 use phase_finance::types::{CoinWeight, StrategyType};
-use regex::Regex;
 
-use crate::contract::{execute, instantiate, query};
+
+use crate::contract::{execute, instantiate};
 use crate::helpers::token_string_to_coin;
-use crate::state::BONDED_BALANCES;
-use phase_finance::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+
+use phase_finance::msg::{ExecuteMsg, InstantiateMsg};
 
 #[test]
 fn proper_initialization() {
@@ -180,7 +180,7 @@ fn dont_cancel_if_unauthorized() {
 #[test]
 fn proper_token_string_to_coin() {
     let token_string = "100uosmo";
-    let text = "100usomo";
+    let _text = "100usomo";
     // println!("ya moms a hoe");
     // for mat in Regex::new(r"(?<=\d)(?=\D)|(?<=\D)(?=\d)").unwrap().find_iter(text) {
     //     println!("mat {:?}", mat);

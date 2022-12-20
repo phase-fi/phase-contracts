@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{AllBalanceResponse, Coin, Uint128};
+use cosmwasm_std::{Coin, Uint128};
 
 use crate::types::{CoinWeight, DcaConfig, State, StrategyType, UpcomingSwapResponse};
 

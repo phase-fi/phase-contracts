@@ -1,4 +1,4 @@
-use cosmwasm_std::{attr, entry_point, Attribute, BankMsg, Coin, SubMsgResponse};
+use cosmwasm_std::{entry_point, BankMsg, Coin, SubMsgResponse};
 use cosmwasm_std::{
     to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdError, StdResult,
     Uint128,
@@ -10,7 +10,7 @@ use phase_finance::constants::DCA_SWAP_ID;
 use crate::execute::{pause_dca, resume_dca, try_cancel_dca, try_perform_dca};
 use crate::helpers::get_next_swap_time;
 use crate::query::{
-    query_all_upcoming_swaps, query_bonded_funds, query_config, query_funds, query_state,
+    query_all_upcoming_swaps, query_config, query_funds, query_state,
     query_upcoming_swap,
 };
 use crate::state::{CONFIG, STATE};
