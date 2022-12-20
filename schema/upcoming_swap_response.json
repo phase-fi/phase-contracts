@@ -9,7 +9,7 @@
     "can_execute": {
       "type": "boolean"
     },
-    "pending_swap": {
+    "pending_swap_time_nanos": {
       "type": [
         "integer",
         "null"

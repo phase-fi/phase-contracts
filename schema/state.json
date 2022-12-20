@@ -14,7 +14,7 @@
     "paused": {
       "type": "boolean"
     },
-    "pending_swap": {
+    "pending_swap_time_nanos": {
       "type": [
         "integer",
         "null"
@@ -31,17 +31,37 @@
   },
   "additionalProperties": false,
   "definitions": {
+    "Coin": {
+      "type": "object",
+      "required": [
+        "amount",
+        "denom"
+      ],
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/Uint128"
+        },
+        "denom": {
+          "type": "string"
+        }
+      }
+    },
     "SwapEvent": {
       "type": "object",
       "required": [
-        "effective_token_out",
         "executed",
-        "timestamp_nanos",
-        "token_in"
+        "timestamp_nanos"
       ],
       "properties": {
         "effective_token_out": {
-          "type": "string"
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Coin"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "executed": {
           "type": "boolean"
@@ -52,7 +72,14 @@
           "minimum": 0.0
         },
         "token_in": {
-          "type": "string"
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Coin"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "additionalProperties": false

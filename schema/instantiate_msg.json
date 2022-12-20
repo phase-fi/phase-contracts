@@ -4,18 +4,19 @@
   "type": "object",
   "required": [
     "amount_per_trade",
-    "cron",
+    "destination_wallet",
     "destinations",
     "num_trades",
     "platform_fee",
     "router_contract",
-    "strategy_type"
+    "strategy_type",
+    "swap_interval_nanos"
   ],
   "properties": {
     "amount_per_trade": {
       "$ref": "#/definitions/Uint128"
     },
-    "cron": {
+    "destination_wallet": {
       "type": "string"
     },
     "destinations": {
@@ -41,6 +42,11 @@
     },
     "strategy_type": {
       "$ref": "#/definitions/StrategyType"
+    },
+    "swap_interval_nanos": {
+      "type": "integer",
+      "format": "uint64",
+      "minimum": 0.0
     }
   },
   "additionalProperties": false,
