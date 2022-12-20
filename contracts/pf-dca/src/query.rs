@@ -1,5 +1,3 @@
-
-
 use cosmwasm_std::{Coin, Deps, Env, StdResult};
 use phase_finance::types::{DcaConfig, State, UpcomingSwapResponse};
 
@@ -25,7 +23,6 @@ pub fn query_all_upcoming_swaps(deps: Deps, env: Env) -> StdResult<Vec<UpcomingS
     // calculate (config.num_trades - state.num_trades_executed) upcoming swaps and add config.swap_interval_nanos to each subsequent swap
     let upcoming_swaps: Vec<UpcomingSwapResponse> = Vec::new();
     let _next_swap_time_nanos = env.block.time.nanos();
-    
 
     Ok(upcoming_swaps)
 }

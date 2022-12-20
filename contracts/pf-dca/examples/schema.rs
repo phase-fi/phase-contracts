@@ -14,7 +14,10 @@ use std::env::current_dir;
 use std::fs::create_dir_all;
 
 use cosmwasm_schema::{export_schema, remove_schemas, schema_for};
-use phase_finance::{msg::{InstantiateMsg, ExecuteMsg, QueryMsg}, types::{UpcomingSwapResponse, DcaConfig, State}};
+use phase_finance::{
+    msg::{ExecuteMsg, InstantiateMsg, QueryMsg},
+    types::{DcaConfig, State, UpcomingSwapResponse},
+};
 
 fn main() {
     let mut out_dir = current_dir().unwrap();
