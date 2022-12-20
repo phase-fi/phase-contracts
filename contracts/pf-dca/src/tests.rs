@@ -186,7 +186,7 @@ fn proper_token_string_to_coin() {
     //     println!("mat {:?}", mat);
     // }
 
-    let coin = token_string_to_coin(token_string);
+    let coin = token_string_to_coin(token_string).unwrap();
 
 
     assert_eq!(coin.amount, Uint128::from(100u128));

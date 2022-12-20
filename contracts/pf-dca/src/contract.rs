@@ -8,10 +8,9 @@ use cw2::set_contract_version;
 use phase_finance::constants::DCA_SWAP_ID;
 
 use crate::execute::{pause_dca, resume_dca, try_cancel_dca, try_perform_dca};
-use crate::helpers::get_next_swap_time;
+use crate::helpers::{get_next_swap_time, token_string_to_coin};
 use crate::query::{
-    query_all_upcoming_swaps, query_config, query_funds, query_state,
-    query_upcoming_swap,
+    query_all_upcoming_swaps, query_config, query_funds, query_state, query_upcoming_swap,
 };
 use crate::state::{CONFIG, STATE};
 
@@ -140,8 +139,8 @@ pub fn try_store_and_finish_dca_swap(
     let mut swap_status = state.swap_status;
     swap_status.push(swap_event.unwrap_or(SwapEvent {
         executed: false,
-        token_in: "".to_string(),
-        effective_token_out: "".to_string(),
+        token_in: Option::None,
+        effective_token_out: Option::None,
         timestamp_nanos: env.block.time.nanos(),
     }));
     state.swap_status = swap_status;
@@ -151,19 +150,12 @@ pub fn try_store_and_finish_dca_swap(
         // now that we have attempted all swaps, we can send the destination coins to the destination wallet
         let msg = BankMsg::Send {
             to_address: config.destination_wallet.to_string(),
-            amount: state.swap_status.iter().map(|swap_event| {
-                if swap_event.executed {
-                    Coin {
-                        denom: swap_event.effective_token_out.to_string(),
-                        amount: config.amount_per_trade,
-                    }
-                } else {
-                    Coin {
-                        denom: swap_event.token_in.to_string(),
-                        amount: config.amount_per_trade,
-                    }
-                }
-            }).collect(),
+            amount: state
+                .swap_status
+                .iter()
+                .filter(|swap_event| swap_event.executed)
+                .map(|swap_event| swap_event.effective_token_out.clone().unwrap())
+                .collect(),
         };
 
         // prepare for the next swap
@@ -182,32 +174,9 @@ pub fn try_store_and_finish_dca_swap(
 
         // respond with compiled swap events
         // todo: add all swap events to the response
-        Ok(
-            Response::new()
-                .add_message(msg)
-                .add_attribute("method", "try_store_and_finish_dca_swap"), // .add_attributes(
-                                                                           //     state
-                                                                           //         .swap_status
-                                                                           //         .iter()
-                                                                           //         .map(|swap_event| {
-                                                                           //             let mut attributes = vec![
-                                                                           //                 attr("swap_event_executed", swap_event.executed.to_string()),
-                                                                           //                 attr("swap_event_token_in", swap_event.token_in.to_string()),
-                                                                           //                 attr(
-                                                                           //                     "swap_event_effective_token_out",
-                                                                           //                     swap_event.effective_token_out.to_string(),
-                                                                           //                 ),
-                                                                           //                 attr(
-                                                                           //                     "swap_event_timestamp_nanos",
-                                                                           //                     swap_event.timestamp_nanos.to_string(),
-                                                                           //                 ),
-                                                                           //             ];
-                                                                           //             attributes
-                                                                           //         })
-                                                                           //         .flatten()
-                                                                           //         .collect::<Vec<Attribute>>(),
-                                                                           // )
-        )
+        Ok(Response::new()
+            .add_message(msg)
+            .add_attribute("method", "try_store_and_finish_dca_swap"))
     } else {
         // we are still waiting for more responses
         STATE.save(deps.storage, &state)?;
@@ -257,8 +226,8 @@ pub fn process_dca_swap_response(
         env.clone(),
         Option::Some(SwapEvent {
             executed: true,
-            token_in: token_in,
-            effective_token_out: token_out,
+            token_in: token_string_to_coin(&token_in),
+            effective_token_out: token_string_to_coin(&token_out),
             timestamp_nanos: env.block.time.nanos(),
         }),
     )

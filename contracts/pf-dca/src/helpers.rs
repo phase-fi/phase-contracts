@@ -1,5 +1,8 @@
-use cosmwasm_std::{Env, MessageInfo, Coin, Uint128};
-use phase_finance::{types::{DcaConfig, State}, error::ContractError};
+use cosmwasm_std::{Coin, Env, MessageInfo, Uint128};
+use phase_finance::{
+    error::ContractError,
+    types::{DcaConfig, State},
+};
 
 use std::str::FromStr;
 
@@ -55,17 +58,21 @@ pub fn get_next_swap_time(
     }
 }
 
+pub fn token_string_to_coin(token_string: &str) -> Option<Coin> {
+    // lets scan token string until we find a character that isnt a number
+    let number_part = token_string
+        .chars()
+        .take_while(|c| c.is_numeric())
+        .collect::<String>();
 
-pub fn token_string_to_coin(token_string: &str) -> Coin {
-
-// lets scan token string until we find a character that isnt a number
-    let number_part = token_string.chars().take_while(|c| c.is_numeric()).collect::<String>();
-    
     // now lets grab the letters
-    let denom_part = token_string.chars().skip(number_part.len()).collect::<String>();
+    let denom_part = token_string
+        .chars()
+        .skip(number_part.len())
+        .collect::<String>();
 
-    Coin {
+    Option::Some(Coin {
         amount: Uint128::from_str(&number_part).unwrap(),
         denom: denom_part,
-    }
+    })
 }
