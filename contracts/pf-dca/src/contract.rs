@@ -26,7 +26,7 @@ const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
     deps: DepsMut,
-    _env: Env,
+    env: Env,
     info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
@@ -70,27 +70,24 @@ pub fn instantiate(
     // store config for this DCA
     let config = DcaConfig {
         owner: info.sender.to_string(),
+        destination_wallet: msg.destination_wallet,
         strategy_type: msg.strategy_type,
         source: info.funds[0].clone(),
         destinations: msg.destinations,
         amount_per_trade: msg.amount_per_trade,
         num_trades: msg.num_trades,
-        cron: msg.cron.clone(),
+        swap_interval_nanos: msg.swap_interval_nanos.clone(),
         platform_wallet: msg.platform_wallet,
         platform_fee: msg.platform_fee,
         router_contract: msg.router_contract,
     };
 
-    let mut state = State {
-        pending_swap: Option::None,
+    let state = State {
+        pending_swap_time_nanos: Option::Some(env.block.time.nanos()),
         paused: false,
         num_trades_executed: Uint128::zero(),
         swap_status: vec![],
     };
-
-    let next_execution_time = get_next_swap_time(&config, &state);
-
-    state.pending_swap = next_execution_time;
 
     CONFIG.save(deps.storage, &config)?;
     STATE.save(deps.storage, &state)?;
@@ -110,7 +107,7 @@ pub fn execute(
     match msg {
         ExecuteMsg::PerformDca {} => try_perform_dca(deps, env, info),
         ExecuteMsg::PauseDca {} => pause_dca(deps, info),
-        ExecuteMsg::ResumeDca {} => resume_dca(deps, info),
+        ExecuteMsg::ResumeDca {} => resume_dca(deps, env, info),
         ExecuteMsg::CancelDca {} => try_cancel_dca(deps, env, info),
     }
 }
@@ -151,9 +148,27 @@ pub fn try_store_and_finish_dca_swap(
 
     // if we have gotten back all the responses we were expecting, then we can finish the swap
     if state.swap_status.len() == config.destinations.len() {
+        // now that we have attempted all swaps, we can send the destination coins to the destination wallet
+        let msg = BankMsg::Send {
+            to_address: config.destination_wallet.to_string(),
+            amount: state.swap_status.iter().map(|swap_event| {
+                if swap_event.executed {
+                    Coin {
+                        denom: swap_event.effective_token_out.to_string(),
+                        amount: config.amount_per_trade,
+                    }
+                } else {
+                    Coin {
+                        denom: swap_event.token_in.to_string(),
+                        amount: config.amount_per_trade,
+                    }
+                }
+            }).collect(),
+        };
+
         // prepare for the next swap
         state = State {
-            pending_swap: get_next_swap_time(&config, &state),
+            pending_swap_time_nanos: get_next_swap_time(env.block.time.nanos(), &config, &state),
             paused: state.paused,
             num_trades_executed: state
                 .num_trades_executed
@@ -162,13 +177,8 @@ pub fn try_store_and_finish_dca_swap(
             swap_status: vec![],
         };
 
-        let msg = BankMsg::Send {
-            to_address: config.owner.to_string(),
-            amount: vec![Coin {
-                denom: todo!(),
-                amount: todo!(),
-            }],
-        };
+        // at this point, we have attempted all swaps, so save the state for the next swap
+        STATE.save(deps.storage, &state)?;
 
         // respond with compiled swap events
         // todo: add all swap events to the response
@@ -259,7 +269,7 @@ pub fn query(deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetUpcomingSwap {} => to_binary(&query_upcoming_swap(deps, env)?),
         QueryMsg::GetAllUpcomingSwaps {} => to_binary(&query_all_upcoming_swaps(deps, env)?),
-        QueryMsg::GetSourceFunds {} => to_binary(&query_bonded_funds(deps, env)?),
+        // QueryMsg::GetSourceFunds {} => to_binary(&query_bonded_funds(deps, env)?),
         QueryMsg::GetAllFunds {} => to_binary(&query_funds(deps, env)?),
         QueryMsg::Config {} => to_binary(&query_config(deps)?),
         QueryMsg::State {} => to_binary(&query_state(deps)?),

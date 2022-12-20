@@ -3,6 +3,7 @@
 ## Upload contract
 quick reminder to upload code using these commands:
 `cd contracts/pf-dca && RUSTFLAGS='-C link-arg=-s' cargo wasm && cd ../..`
+
 `osmosisd tx wasm store target/wasm32-unknown-unknown/release/pf_dca.wasm --from main -y --output json -b block  --node https://rpc.testnet.osmosis.zone:443 --chain-id osmo-test-4 --gas-prices 10uosmo --gas auto --gas-adjustment 1.3`
 
 ## Instantiate contract and create task
@@ -23,6 +24,8 @@ Currently if you are querying more than 5 minutes after the croncat instantiatio
 
 
 gas_base_fee + gas_action_fee*actiions.length
+
+CODE ID: 4792
 
 
 ## SWAPROUTER

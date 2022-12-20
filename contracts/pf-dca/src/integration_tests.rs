@@ -39,6 +39,7 @@ mod tests {
         let cw_template_id = app.store_code(contract_template());
 
         let msg = InstantiateMsg {
+            destination_wallet: "osmo123".to_string(),
             strategy_type: StrategyType::Linear,
             destinations: vec![CoinWeight {
                 denom: "uion".to_string(),
@@ -46,7 +47,7 @@ mod tests {
             }],
             amount_per_trade: Uint128::from(10u128),
             num_trades: Uint128::from(10u128),
-            cron: "* * 1 * *".to_string(),
+            swap_interval_nanos: 100_000_000_000,
             platform_wallet: Option::Some("osmo123".to_string()),
             platform_fee: Uint128::zero(),
             router_contract: "osmoabc".to_string(),

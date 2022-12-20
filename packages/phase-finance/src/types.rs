@@ -4,10 +4,11 @@ use cosmwasm_std::{Coin, Uint128};
 #[cw_serde]
 pub struct DcaConfig {
     pub owner: String,
+    pub destination_wallet: String,
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
     pub num_trades: Uint128,
-    pub cron: String,
+    pub swap_interval_nanos: u64,
     pub source: Coin,
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
@@ -38,14 +39,17 @@ pub struct CoinWeight {
 
 #[cw_serde]
 pub struct UpcomingSwapResponse {
-    pub pending_swap: Option<u64>,
+    pub pending_swap_time_nanos: Option<u64>,
     pub can_execute: bool,
 }
 
 #[cw_serde]
 pub struct State {
-    pub pending_swap: Option<u64>,
+    // epoch time in nanons of the earliest allowed time of the swap that is yet to be executed
+    pub pending_swap_time_nanos: Option<u64>,
+    // if the strategy is paused
     pub paused: bool,
+    // number of trades already executed (should never be more than config.num_trades)
     pub num_trades_executed: Uint128,
 
     // for collecting all swaps in the reply handler and incrementing DCA pending swap
