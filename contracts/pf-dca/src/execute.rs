@@ -125,7 +125,7 @@ pub fn try_perform_dca(
                     )), // 1% slippage, todo: configure from config
                 })
                 .unwrap(),
-                funds: vec![in_funds.clone()],
+                funds: vec![in_funds],
             };
 
             SubMsg::reply_always(msg, DCA_SWAP_ID)

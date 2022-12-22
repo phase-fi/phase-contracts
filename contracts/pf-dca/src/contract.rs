@@ -1,4 +1,4 @@
-use cosmwasm_std::{entry_point, BankMsg, Coin, SubMsgResponse};
+use cosmwasm_std::{entry_point, BankMsg, SubMsgResponse};
 use cosmwasm_std::{
     to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdError, StdResult,
     Uint128,
@@ -75,7 +75,7 @@ pub fn instantiate(
         destinations: msg.destinations,
         amount_per_trade: msg.amount_per_trade,
         num_trades: msg.num_trades,
-        swap_interval_nanos: msg.swap_interval_nanos.clone(),
+        swap_interval_nanos: msg.swap_interval_nanos,
         platform_wallet: msg.platform_wallet,
         platform_fee: msg.platform_fee,
         router_contract: msg.router_contract,

@@ -49,11 +49,11 @@ pub fn get_next_swap_time(
             }
         }
         None => {
-            return Option::Some(
+            Option::Some(
                 current_time_nanos
                     .checked_add(config.swap_interval_nanos)
                     .unwrap_or(current_time_nanos), // TODO: in case of overflow, just return now. Is this safe?
-            );
+            )
         }
     }
 }

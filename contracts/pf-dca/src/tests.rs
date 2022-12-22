@@ -1,12 +1,9 @@
 use cosmwasm_std::testing::{
     mock_dependencies, mock_dependencies_with_balance, mock_env, mock_info,
 };
-use cosmwasm_std::{
-    coins, BankMsg, CosmosMsg, Uint128,
-};
+use cosmwasm_std::{coins, BankMsg, CosmosMsg, Uint128};
 
 use phase_finance::types::{CoinWeight, StrategyType};
-
 
 use crate::contract::{execute, instantiate};
 use crate::helpers::token_string_to_coin;
@@ -187,7 +184,6 @@ fn proper_token_string_to_coin() {
     // }
 
     let coin = token_string_to_coin(token_string).unwrap();
-
 
     assert_eq!(coin.amount, Uint128::from(100u128));
     assert_eq!(coin.denom, "uosmo".to_string());
