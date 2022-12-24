@@ -5,4 +5,7 @@ pub mod query;
 pub mod state;
 
 #[cfg(test)]
+pub mod multitest;
+
+#[cfg(test)]
 pub mod tests;

@@ -1,11 +1,22 @@
+pub use anyhow::Result;
+pub use derivative::Derivative;
+
 pub use crate::contract::{
     execute as executeDCA, instantiate as instantiateDCA, query as queryDCA, reply as replyDCA,
 };
-use cosmwasm_std::Empty;
+pub use cosmwasm_std::{coin, Coin, Empty, StdResult};
 pub use cw_multi_test::{App, AppResponse, Contract, ContractWrapper, Executor};
 
 pub use swaprouter::contract::{
     execute as executeRouter, instantiate as instantiateRouter, query as queryRouter,
+};
+
+pub use phase_finance::{
+    error::ContractError as DCAContractError,
+    msg::{
+        ExecuteMsg as DCAExecuteMsg, InstantiateMsg as DCAInstantiateMsg, QueryMsg as DCAQueryMsg,
+    },
+    types::{DcaConfig, State as DCAState, UpcomingSwapResponse},
 };
 
 pub const USER: &str = "user";
