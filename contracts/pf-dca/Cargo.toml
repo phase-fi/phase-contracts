@@ -41,4 +41,4 @@ swaprouter = { path = "./../../packages/swaprouter", features = [
 regex = "1.7.0"
 
 [dev-dependencies]
-cw-multi-test = "0.13.2"
+cw-multi-test = "0.16"

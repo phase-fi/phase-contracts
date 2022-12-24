@@ -28,9 +28,6 @@ pub struct InstantiateMsg {
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
 
-    pub platform_fee: Uint128,
-    pub platform_wallet: Option<String>,
-
     pub router_contract: String,
     pub source_denom: String,
 }

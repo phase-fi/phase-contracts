@@ -72,10 +72,10 @@ pub fn try_perform_dca(
     let config = CONFIG.load(deps.storage)?;
     let state = STATE.load(deps.storage)?;
 
-    ensure!(state.paused, ContractError::DcaPaused);
+    ensure!(!state.paused, ContractError::DcaPaused);
 
     ensure!(
-        !state.next_swap.is_expired(&env.block),
+        state.next_swap.is_expired(&env.block),
         ContractError::DcaSwapNotAllowedYet {
             next_swap_event_time: get_expiration_time(state.next_swap)
         }

@@ -37,20 +37,12 @@ pub fn instantiate(
 
     let funds = must_pay(&info, &msg.source_denom)?;
 
-    if (msg.platform_fee.gt(&Uint128::zero())) && (msg.platform_wallet.is_none()) {
-        return Err(ContractError::CustomError {
-            val: "platform fee is set but platform wallet is not".to_string(),
-        });
-    }
-
     // check that amount deposited is correct for dca params
     if msg
         .amount_per_trade
         .checked_mul(msg.num_trades)
         .expect("overflow")
-        .checked_add(msg.platform_fee)
-        .expect("overflow")
-        >= funds
+        > funds
     {
         return Err(ContractError::CustomError {
             val: "amount deposited does not match amount per trade and num trades".to_string(),

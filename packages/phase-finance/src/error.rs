@@ -1,5 +1,5 @@
 use cosmwasm_std::StdError;
-use cw_utils::{Expiration, PaymentError};
+use cw_utils::PaymentError;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
