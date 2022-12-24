@@ -1,5 +1,6 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Coin, Uint128};
+use cw_utils::Duration;
 
 use crate::types::{CoinWeight, DcaConfig, State, StrategyType, UpcomingSwapResponse};
 
@@ -23,7 +24,7 @@ pub struct InstantiateMsg {
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
     pub num_trades: Uint128,
-    pub swap_interval_nanos: u64,
+    pub swap_interval: Duration,
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
 
@@ -31,6 +32,7 @@ pub struct InstantiateMsg {
     pub platform_wallet: Option<String>,
 
     pub router_contract: String,
+    pub source_denom: String,
 }
 
 #[cw_serde]
@@ -59,8 +61,8 @@ pub enum QueryMsg {
     #[returns(Vec<UpcomingSwapResponse>)]
     GetAllUpcomingSwaps {},
     // get the amount of funds that are bonded
-    // #[returns(AllBalanceResponse)]
-    // GetSourceFunds,
+    #[returns(Coin)]
+    GetSourceFunds,
     // get the amount of funds that are claimable
     #[returns(Vec<Coin>)]
     GetAllFunds {},

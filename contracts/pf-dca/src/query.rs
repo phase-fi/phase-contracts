@@ -1,18 +1,18 @@
 use cosmwasm_std::{Coin, Deps, Env, StdResult};
+
 use phase_finance::types::{DcaConfig, State, UpcomingSwapResponse};
 
 use crate::{
-    helpers::can_execute,
+    helpers::get_expiration_time,
     state::{CONFIG, STATE},
 };
 
 pub fn query_upcoming_swap(deps: Deps, env: Env) -> StdResult<UpcomingSwapResponse> {
-    let config = CONFIG.load(deps.storage)?;
     let state = STATE.load(deps.storage)?;
 
     Ok(UpcomingSwapResponse {
-        pending_swap_time_nanos: state.pending_swap_time_nanos,
-        can_execute: can_execute(&env, &config, &state),
+        next_swap: get_expiration_time(state.next_swap),
+        can_execute: state.next_swap.is_expired(&env.block),
     })
 }
 
@@ -28,10 +28,8 @@ pub fn query_all_upcoming_swaps(deps: Deps, env: Env) -> StdResult<Vec<UpcomingS
 }
 
 pub fn query_bonded_funds(deps: Deps, env: Env) -> StdResult<Coin> {
-    deps.querier.query_balance(
-        env.contract.address,
-        CONFIG.load(deps.storage)?.source.denom,
-    )
+    deps.querier
+        .query_balance(env.contract.address, CONFIG.load(deps.storage)?.source)
 }
 
 pub fn query_funds(deps: Deps, env: Env) -> StdResult<Vec<Coin>> {
@@ -48,9 +46,7 @@ pub fn query_funds(deps: Deps, env: Env) -> StdResult<Vec<Coin>> {
         .querier
         .query_all_balances(env.contract.address)?
         .into_iter()
-        .filter(|coin| {
-            destination_denoms.contains(&coin.denom) || coin.denom == config.source.denom
-        })
+        .filter(|coin| destination_denoms.contains(&coin.denom) || coin.denom == config.source)
         .collect();
 
     Ok(balances)

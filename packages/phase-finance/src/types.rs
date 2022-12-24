@@ -1,5 +1,6 @@
 use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Coin, Uint128};
+use cw_utils::{Duration, Expiration};
 
 #[cw_serde]
 pub struct DcaConfig {
@@ -8,15 +9,10 @@ pub struct DcaConfig {
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
     pub num_trades: Uint128,
-    pub swap_interval_nanos: u64,
-    pub source: Coin,
+    pub swap_interval: Duration,
+    pub source: String,
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
-
-    // platform fee (configurable by initializer)
-    pub platform_fee: Uint128,
-    // platform fee recipient (configurable by initializer)
-    pub platform_wallet: Option<String>,
 
     pub router_contract: String,
     // croncat to be added once their contracts are on mainnet
@@ -39,14 +35,14 @@ pub struct CoinWeight {
 
 #[cw_serde]
 pub struct UpcomingSwapResponse {
-    pub pending_swap_time_nanos: Option<u64>,
+    pub next_swap: u64,
     pub can_execute: bool,
 }
 
 #[cw_serde]
 pub struct State {
     // epoch time in nanons of the earliest allowed time of the swap that is yet to be executed
-    pub pending_swap_time_nanos: Option<u64>,
+    pub next_swap: Expiration,
     // if the strategy is paused
     pub paused: bool,
     // number of trades already executed (should never be more than config.num_trades)

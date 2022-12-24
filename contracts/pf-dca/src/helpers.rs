@@ -1,8 +1,6 @@
-use cosmwasm_std::{Coin, Env, MessageInfo, Uint128};
-use phase_finance::{
-    error::ContractError,
-    types::{DcaConfig, State},
-};
+use cosmwasm_std::{Coin, MessageInfo, Uint128};
+use cw_utils::Expiration;
+use phase_finance::{error::ContractError, types::DcaConfig};
 
 use std::str::FromStr;
 
@@ -13,48 +11,10 @@ pub fn verify_sender(config: &DcaConfig, info: &MessageInfo) -> Result<(), Contr
     Ok(())
 }
 
-pub fn can_execute(env: &Env, config: &DcaConfig, state: &State) -> bool {
-    state
-        .pending_swap_time_nanos
-        .unwrap_or(u64::MAX)
-        .le(&env.block.time.nanos())
-        && !state.paused
-        && state.num_trades_executed < config.num_trades
-}
-
-/// Gets the next swap time
-///
-/// If we have already executed the number of trades specified by the strategy, we will return Option::None
-///
-/// If we have a pending swap time, we will return that time if it is greater than the current time, otherwise we will return the current time + swap_interval_nanos
-pub fn get_next_swap_time(
-    current_time_nanos: u64,
-    config: &DcaConfig,
-    state: &State,
-) -> Option<u64> {
-    if state.num_trades_executed >= config.num_trades {
-        return Option::None;
-    }
-    match state.pending_swap_time_nanos {
-        Some(pending_swap_time_nanos) => {
-            if current_time_nanos > pending_swap_time_nanos {
-                // if current time is greater than the pending swap time, then we can swap during the next dca time (now + swap_interval_nanos)
-                Option::Some(
-                    current_time_nanos
-                        .checked_add(config.swap_interval_nanos)
-                        .unwrap_or(current_time_nanos), // TODO: in case of overflow, just return now. Is this safe?
-                )
-            } else {
-                Option::Some(pending_swap_time_nanos)
-            }
-        }
-        None => {
-            Option::Some(
-                current_time_nanos
-                    .checked_add(config.swap_interval_nanos)
-                    .unwrap_or(current_time_nanos), // TODO: in case of overflow, just return now. Is this safe?
-            )
-        }
+pub fn get_expiration_time(exp: Expiration) -> u64 {
+    match exp {
+        Expiration::AtTime(time) => time.seconds(),
+        _ => u64::MAX,
     }
 }
 
