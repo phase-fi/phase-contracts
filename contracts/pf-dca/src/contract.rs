@@ -54,11 +54,11 @@ pub fn instantiate(
         owner: info.sender.to_string(),
         destination_wallet: msg.destination_wallet,
         strategy_type: msg.strategy_type,
-        source: msg.source_denom,
+        source_denom: msg.source_denom,
         destinations: msg.destinations,
         amount_per_trade: msg.amount_per_trade,
         num_trades: msg.num_trades,
-        swap_interval: msg.swap_interval.clone(),
+        swap_interval: msg.swap_interval,
         router_contract: msg.router_contract,
     };
 

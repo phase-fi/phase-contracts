@@ -95,13 +95,13 @@ pub fn try_perform_dca(
         .iter()
         .map(|d| {
             let in_funds = Coin {
-                denom: config.source.clone(),
+                denom: config.source_denom.clone(),
                 amount: d
                     .weight
                     .checked_mul(config.amount_per_trade)
-                    .unwrap()
+                    .unwrap_or_default()
                     .checked_div(total_weight)
-                    .unwrap(),
+                    .unwrap_or_default(),
             };
 
             let msg = WasmMsg::Execute {

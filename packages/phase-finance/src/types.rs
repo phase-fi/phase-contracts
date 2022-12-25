@@ -10,7 +10,7 @@ pub struct DcaConfig {
     pub amount_per_trade: Uint128,
     pub num_trades: Uint128,
     pub swap_interval: Duration,
-    pub source: String,
+    pub source_denom: String,
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
 

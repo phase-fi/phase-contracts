@@ -1,5 +1,8 @@
+use std::ops::{Add, Mul};
+
 use cosmwasm_std::{Coin, Deps, Env, StdResult};
 
+use cw_utils::Duration;
 use phase_finance::types::{DcaConfig, State, UpcomingSwapResponse};
 
 use crate::{
@@ -17,19 +20,44 @@ pub fn query_upcoming_swap(deps: Deps, env: Env) -> StdResult<UpcomingSwapRespon
 }
 
 pub fn query_all_upcoming_swaps(deps: Deps, env: Env) -> StdResult<Vec<UpcomingSwapResponse>> {
-    let _config = CONFIG.load(deps.storage)?;
-    let _state = STATE.load(deps.storage)?;
+    let config = CONFIG.load(deps.storage)?;
+    let state = STATE.load(deps.storage)?;
 
-    // calculate (config.num_trades - state.num_trades_executed) upcoming swaps and add config.swap_interval_nanos to each subsequent swap
-    let upcoming_swaps: Vec<UpcomingSwapResponse> = Vec::new();
-    let _next_swap_time_nanos = env.block.time.nanos();
+    let pending_swaps = config.num_trades - state.num_trades_executed;
+
+    let upcoming_swaps: Vec<UpcomingSwapResponse> =
+        Vec::<UpcomingSwapResponse>::with_capacity(pending_swaps.u128() as usize)
+            .iter()
+            .enumerate()
+            .map(|(i, _)| {
+                if i > 0 {
+                    let index = i + 1;
+                    let interval_in_seconds = match config.swap_interval {
+                        Duration::Time(time) => time,
+                        _ => 0,
+                    };
+                    return UpcomingSwapResponse {
+                        next_swap: get_expiration_time(state.next_swap)
+                            .add(interval_in_seconds.mul(index as u64)),
+                        can_execute: false,
+                    };
+                }
+
+                UpcomingSwapResponse {
+                    next_swap: get_expiration_time(state.next_swap),
+                    can_execute: state.next_swap.is_expired(&env.block),
+                }
+            })
+            .collect();
 
     Ok(upcoming_swaps)
 }
 
 pub fn query_bonded_funds(deps: Deps, env: Env) -> StdResult<Coin> {
-    deps.querier
-        .query_balance(env.contract.address, CONFIG.load(deps.storage)?.source)
+    deps.querier.query_balance(
+        env.contract.address,
+        CONFIG.load(deps.storage)?.source_denom,
+    )
 }
 
 pub fn query_funds(deps: Deps, env: Env) -> StdResult<Vec<Coin>> {
@@ -46,7 +74,9 @@ pub fn query_funds(deps: Deps, env: Env) -> StdResult<Vec<Coin>> {
         .querier
         .query_all_balances(env.contract.address)?
         .into_iter()
-        .filter(|coin| destination_denoms.contains(&coin.denom) || coin.denom == config.source)
+        .filter(|coin| {
+            destination_denoms.contains(&coin.denom) || coin.denom == config.source_denom
+        })
         .collect();
 
     Ok(balances)
