@@ -1,6 +1,6 @@
 # Based on https://github.com/actions-rs/example/blob/master/.github/workflows/quickstart.yml
 
-on: [push, pull_request]
+on: [pull_request]
 
 name: Basic
 
@@ -29,7 +29,7 @@ jobs:
       - name: Compile WASM contract
         uses: actions-rs/cargo@v1
         with:
-          command: wasm
+          command: wasm-dca
           args: --locked
         env:
           RUSTFLAGS: "-C link-arg=-s"
@@ -64,8 +64,8 @@ jobs:
       - name: Generate Schema
         uses: actions-rs/cargo@v1
         with:
-          command: schema
-          args: --locked
+          command: run
+          args: --bin schema
 
       - name: Schema Changes
         # fails if any changes not committed

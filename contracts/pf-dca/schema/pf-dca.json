@@ -11,7 +11,6 @@
       "destination_wallet",
       "destinations",
       "num_trades",
-      "platform_fee",
       "router_contract",
       "source_denom",
       "strategy_type",
@@ -32,15 +31,6 @@
       },
       "num_trades": {
         "$ref": "#/definitions/Uint128"
-      },
-      "platform_fee": {
-        "$ref": "#/definitions/Uint128"
-      },
-      "platform_wallet": {
-        "type": [
-          "string",
-          "null"
-        ]
       },
       "router_contract": {
         "type": "string"
@@ -268,7 +258,7 @@
         "num_trades",
         "owner",
         "router_contract",
-        "source",
+        "source_denom",
         "strategy_type",
         "swap_interval"
       ],
@@ -294,7 +284,7 @@
         "router_contract": {
           "type": "string"
         },
-        "source": {
+        "source_denom": {
           "type": "string"
         },
         "strategy_type": {
