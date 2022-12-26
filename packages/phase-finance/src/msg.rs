@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Coin, Uint128};
+use cosmwasm_std::{Coin, Uint128, Decimal};
 use cw_utils::Duration;
 
 use crate::types::{CoinWeight, DcaConfig, State, StrategyType, UpcomingSwapResponse};
@@ -27,6 +27,8 @@ pub struct InstantiateMsg {
     pub swap_interval: Duration,
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
+    // slippage is the same for all swaps, can be changed later
+    pub max_slippage: Decimal,
 
     pub router_contract: String,
     pub source_denom: String,
