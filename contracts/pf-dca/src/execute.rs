@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    ensure, to_binary, BankMsg, Coin, Decimal, DepsMut, Env, MessageInfo, Response, SubMsg,
+    ensure, to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg,
     Uint128, WasmMsg,
 };
 
