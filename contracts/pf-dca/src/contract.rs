@@ -56,6 +56,7 @@ pub fn instantiate(
         strategy_type: msg.strategy_type,
         source_denom: msg.source_denom,
         destinations: msg.destinations,
+        max_slippage: msg.max_slippage,
         amount_per_trade: msg.amount_per_trade,
         num_trades: msg.num_trades,
         swap_interval: msg.swap_interval,

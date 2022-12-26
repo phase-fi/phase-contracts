@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Coin, Uint128};
+use cosmwasm_std::{Coin, Uint128, Decimal};
 use cw_utils::{Duration, Expiration};
 
 #[cw_serde]
@@ -13,6 +13,8 @@ pub struct DcaConfig {
     pub source_denom: String,
     // can DCA into multiple coins
     pub destinations: Vec<CoinWeight>,
+    // slippage is the same for all swaps, but can be changed later
+    pub max_slippage: Decimal,
 
     pub router_contract: String,
     // croncat to be added once their contracts are on mainnet

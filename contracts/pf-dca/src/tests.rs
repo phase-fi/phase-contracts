@@ -1,7 +1,7 @@
 use cosmwasm_std::testing::{
     mock_dependencies, mock_env, mock_info, MockApi, MockQuerier, MockStorage,
 };
-use cosmwasm_std::{coins, from_binary, BlockInfo, Coin, OwnedDeps, Timestamp, Uint128};
+use cosmwasm_std::{coins, from_binary, BlockInfo, Coin, OwnedDeps, Timestamp, Uint128, Decimal};
 
 use cw_utils::Duration;
 use phase_finance::types::{CoinWeight, StrategyType};
@@ -31,6 +31,7 @@ fn do_instantiate() -> OwnedDeps<MockStorage, MockApi, MockQuerier> {
                 weight: Uint128::from(100u128),
             },
         ],
+        max_slippage: Decimal::from_ratio(1u128, 100u128),
         amount_per_trade: Uint128::from(10u128),
         num_trades: Uint128::from(10u128),
         swap_interval: Duration::Time(1),
@@ -54,6 +55,7 @@ fn proper_initialization() {
             denom: "uion".to_string(),
             weight: Uint128::from(100u128),
         }],
+        max_slippage: Decimal::from_ratio(1u128, 100u128),
         amount_per_trade: Uint128::from(10u128),
         num_trades: Uint128::from(10u128),
         swap_interval: Duration::Height(100_000_000_000),
