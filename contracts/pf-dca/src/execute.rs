@@ -1,5 +1,5 @@
 use cosmwasm_std::{
-    ensure, to_binary, BankMsg, Coin, Decimal, DepsMut, Env, MessageInfo, Response, SubMsg,
+    ensure, to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg,
     Uint128, WasmMsg,
 };
 
@@ -109,9 +109,7 @@ pub fn try_perform_dca(
                 msg: to_binary(&swaprouter::msg::ExecuteMsg::Swap {
                     input_coin: in_funds.clone(),
                     output_denom: d.denom.clone(),
-                    slippage: swaprouter::msg::Slippage::MaxSlippagePercentage(Decimal::percent(
-                        1u64,
-                    )), // 1% slippage, todo: configure from config
+                    slippage: swaprouter::msg::Slippage::MaxSlippagePercentage(config.max_slippage), // 1% slippage, todo: configure from config
                 })
                 .unwrap(),
                 funds: vec![in_funds],
