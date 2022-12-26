@@ -26,8 +26,9 @@ optimize = """docker run --rm -v "$(pwd)":/code \
 cosmwasm-std = "1.1.5"
 cosmwasm-schema = { version = "1.1.5" }
 cosmwasm-storage = "1.1.5"
-cw-storage-plus = "0.16.0"
-cw2 = "0.16.0"
+cw-storage-plus = "1.0.1"
+cw2 = "1.0.1"
+cw-utils = "1.0.1"
 osmosis-std = "0.1.7"
 strum = "0.24.1"
 strum_macros = "0.24.2"
@@ -40,4 +41,6 @@ swaprouter = { path = "./../../packages/swaprouter", features = [
 regex = "1.7.0"
 
 [dev-dependencies]
-cw-multi-test = "0.13.2"
+cw-multi-test = "0.16"
+derivative = "2"
+anyhow = "1"
