@@ -1,7 +1,7 @@
 use cosmwasm_std::testing::{
     mock_dependencies, mock_env, mock_info, MockApi, MockQuerier, MockStorage,
 };
-use cosmwasm_std::{coins, from_binary, BlockInfo, Coin, OwnedDeps, Timestamp, Uint128, Decimal};
+use cosmwasm_std::{coins, from_binary, BlockInfo, Coin, Decimal, OwnedDeps, Timestamp, Uint128};
 
 use cw_utils::Duration;
 use phase_finance::types::{CoinWeight, StrategyType};

@@ -1,6 +1,5 @@
 use cosmwasm_std::{
-    ensure, to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg,
-    Uint128, WasmMsg,
+    ensure, to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg, Uint128, WasmMsg,
 };
 
 use phase_finance::constants::DCA_SWAP_ID;
