@@ -79,10 +79,6 @@ pub fn try_perform_dca(
             next_swap_event_time: get_expiration_time(state.next_swap)
         }
     );
-    // todo: balance checks here?
-    // let _balance = deps
-    //     .querier
-    //     .query_balance(env.contract.address, config.source.denom.clone())?;
 
     let total_weight = config
         .destinations
@@ -108,7 +104,7 @@ pub fn try_perform_dca(
                 msg: to_binary(&swaprouter::msg::ExecuteMsg::Swap {
                     input_coin: in_funds.clone(),
                     output_denom: d.denom.clone(),
-                    slippage: swaprouter::msg::Slippage::MaxSlippagePercentage(config.max_slippage), // 1% slippage, todo: configure from config
+                    slippage: swaprouter::msg::Slippage::MaxSlippagePercentage(config.max_slippage),
                 })
                 .unwrap(),
                 funds: vec![in_funds],
