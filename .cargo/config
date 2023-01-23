@@ -1,2 +1,3 @@
 [alias]
 wasm-dca = "build --lib --release --target wasm32-unknown-unknown --package pf-dca"
+wasm-router = "build --lib --release --target wasm32-unknown-unknown --package swaprouter"

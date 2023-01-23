@@ -1,0 +1,7 @@
+{
+    "weights": "50uosmo,50ibc/75C8E3091D507A5A111C652F9C76C2E53059E24759A98B523723E02FA33EEF51",
+    "initial-deposit": "20uosmo,0.4ibc/75C8E3091D507A5A111C652F9C76C2E53059E24759A98B523723E02FA33EEF51",
+    "swap-fee": "0.01",
+    "exit-fee": "0.01",
+    "future-governor": "168h"
+}

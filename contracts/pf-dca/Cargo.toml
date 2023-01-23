@@ -33,7 +33,6 @@ osmosis-std = "0.1.7"
 strum = "0.24.1"
 strum_macros = "0.24.2"
 thiserror = { version = "1.0.37" }
-cw-asset = { git = "https://github.com/apollodao/cw-asset.git", rev = "5e51773da42ef82faa67576454e8c4b0971097f2" }
 phase-finance = { path = "../../packages/phase-finance" }
 swaprouter = { path = "./../../packages/swaprouter", features = [
   "imported",
