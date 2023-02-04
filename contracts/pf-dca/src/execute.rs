@@ -1,6 +1,6 @@
 use cosmwasm_std::{
-    ensure, ensure_eq, to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg,
-    Uint128, WasmMsg,
+    ensure, ensure_eq, ensure_ne, to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response,
+    SubMsg, Uint128, WasmMsg,
 };
 
 use phase_finance::constants::DCA_SWAP_ID;
@@ -79,6 +79,12 @@ pub fn try_perform_dca(
     );
 
     ensure!(!state.paused, ContractError::DcaPaused);
+
+    ensure_ne!(
+        config.num_trades,
+        state.num_trades_executed,
+        ContractError::MaxTradeLimit {}
+    );
 
     ensure!(
         state.next_swap.is_expired(&env.block),

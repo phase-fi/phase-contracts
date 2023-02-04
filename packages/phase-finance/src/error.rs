@@ -22,6 +22,9 @@ pub enum ContractError {
     #[error("DCA strategy is paused")]
     DcaPaused,
 
+    #[error("Reached max trade limit")]
+    MaxTradeLimit {},
+
     #[error("Custom Error val: {val:?}")]
     CustomError { val: String },
     // Add any other custom errors you like here.

@@ -1,13 +1,16 @@
 use cosmwasm_std::testing::{
     mock_dependencies, mock_env, mock_info, MockApi, MockQuerier, MockStorage,
 };
-use cosmwasm_std::{coins, from_binary, BlockInfo, Coin, Decimal, OwnedDeps, Timestamp, Uint128};
+use cosmwasm_std::{
+    coins, from_binary, BlockInfo, Coin, Decimal, Env, OwnedDeps, StdResult, Timestamp, Uint128,
+};
 
 use cw_utils::Duration;
 use phase_finance::types::{CoinWeight, StrategyType};
 
 use crate::contract::{execute, instantiate, query};
 use crate::helpers::token_string_to_coin;
+use crate::state::STATE;
 
 use phase_finance::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 
@@ -20,7 +23,7 @@ fn do_instantiate() -> OwnedDeps<MockStorage, MockApi, MockQuerier> {
 
     let instantiate_msg = InstantiateMsg {
         recipient_address: "osmo123".to_string(),
-        executor_address: "osmo123".to_string(),
+        executor_address: "executor".to_string(),
         strategy_type: StrategyType::Linear,
         destinations: vec![
             CoinWeight {
@@ -43,6 +46,16 @@ fn do_instantiate() -> OwnedDeps<MockStorage, MockApi, MockQuerier> {
     instantiate(deps.as_mut(), env, info, instantiate_msg).unwrap();
 
     deps
+}
+
+fn fast_forward_time(mut env: Env, time: u64) -> Env {
+    env.block = BlockInfo {
+        time: env.block.time.plus_seconds(time),
+        height: env.block.height + 1,
+        chain_id: env.block.chain_id,
+    };
+
+    return env;
 }
 
 #[test]
@@ -158,4 +171,40 @@ fn query_handler_claim_funds() {
         from_binary(&query(deps.as_ref(), env, QueryMsg::GetAllFunds {}).unwrap()).unwrap();
 
     assert_eq!(res, balance);
+}
+
+#[test]
+fn cannot_perform_dca_if_trade_limit_reached() {
+    let mut deps = do_instantiate();
+
+    let env = fast_forward_time(mock_env(), 100);
+
+    // Can execute because not limit reached
+    execute(
+        deps.as_mut(),
+        env.clone(),
+        mock_info("executor", &coins(100, "uion")),
+        ExecuteMsg::PerformDca {},
+    )
+    .unwrap();
+
+    let env = fast_forward_time(env, 100);
+
+    STATE
+        .update(deps.as_mut().storage, |mut s| -> StdResult<_> {
+            s.num_trades_executed = Uint128::from(10u128);
+            Ok(s)
+        })
+        .expect("error: updating state");
+
+    // Cannot execute because limit reached
+    let res = execute(
+        deps.as_mut(),
+        env,
+        mock_info("executor", &coins(100, "uion")),
+        ExecuteMsg::PerformDca {},
+    )
+    .unwrap_err();
+
+    assert_eq!(res.to_string(), "Reached max trade limit");
 }
