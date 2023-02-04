@@ -1,11 +1,12 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Coin, Decimal, Uint128};
+use cosmwasm_std::{CanonicalAddr, Coin, Decimal, Uint128};
 use cw_utils::{Duration, Expiration};
 
 #[cw_serde]
 pub struct DcaConfig {
     pub owner: String,
-    pub destination_wallet: String,
+    pub recipient_address: String,
+    pub executor_address: CanonicalAddr,
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
     pub num_trades: Uint128,

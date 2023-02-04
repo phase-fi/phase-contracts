@@ -20,7 +20,8 @@ use crate::types::{CoinWeight, DcaConfig, State, StrategyType, UpcomingSwapRespo
 
 #[cw_serde]
 pub struct InstantiateMsg {
-    pub destination_wallet: String,
+    pub recipient_address: String,
+    pub executor_address: String,
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
     pub num_trades: Uint128,

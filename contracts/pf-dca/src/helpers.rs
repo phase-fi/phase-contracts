@@ -5,7 +5,7 @@ use phase_finance::{error::ContractError, types::DcaConfig};
 use std::str::FromStr;
 
 pub fn verify_sender(config: &DcaConfig, info: &MessageInfo) -> Result<(), ContractError> {
-    if info.sender != config.owner && info.sender != config.destination_wallet {
+    if info.sender != config.owner && info.sender != config.recipient_address {
         return Err(ContractError::Unauthorized {});
     }
     Ok(())

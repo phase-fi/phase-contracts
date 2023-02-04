@@ -1,5 +1,6 @@
 use cosmwasm_std::{
-    ensure, to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg, Uint128, WasmMsg,
+    ensure, ensure_eq, to_binary, BankMsg, Coin, DepsMut, Env, MessageInfo, Response, SubMsg,
+    Uint128, WasmMsg,
 };
 
 use phase_finance::constants::DCA_SWAP_ID;
@@ -66,10 +67,16 @@ pub fn resume_dca(deps: DepsMut, env: Env, info: MessageInfo) -> Result<Response
 pub fn try_perform_dca(
     deps: DepsMut,
     env: Env,
-    _info: MessageInfo,
+    info: MessageInfo,
 ) -> Result<Response, ContractError> {
     let config = CONFIG.load(deps.storage)?;
     let state = STATE.load(deps.storage)?;
+
+    ensure_eq!(
+        deps.api.addr_humanize(&config.executor_address)?,
+        info.sender,
+        ContractError::Unauthorized {}
+    );
 
     ensure!(!state.paused, ContractError::DcaPaused);
 

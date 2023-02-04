@@ -19,7 +19,8 @@ fn do_instantiate() -> OwnedDeps<MockStorage, MockApi, MockQuerier> {
     let env = mock_env();
 
     let instantiate_msg = InstantiateMsg {
-        destination_wallet: "osmo123".to_string(),
+        recipient_address: "osmo123".to_string(),
+        executor_address: "osmo123".to_string(),
         strategy_type: StrategyType::Linear,
         destinations: vec![
             CoinWeight {
@@ -49,7 +50,8 @@ fn proper_initialization() {
     let mut deps = mock_dependencies();
 
     let msg = InstantiateMsg {
-        destination_wallet: "osmo123".to_string(),
+        recipient_address: "osmo123".to_string(),
+        executor_address: "osmo123".to_string(),
         strategy_type: StrategyType::Linear,
         destinations: vec![CoinWeight {
             denom: "uion".to_string(),

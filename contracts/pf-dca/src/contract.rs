@@ -52,7 +52,8 @@ pub fn instantiate(
     // store config for this DCA
     let config = DcaConfig {
         owner: info.sender.to_string(),
-        destination_wallet: msg.destination_wallet,
+        recipient_address: msg.recipient_address,
+        executor_address: deps.api.addr_canonicalize(&msg.executor_address)?,
         strategy_type: msg.strategy_type,
         source_denom: msg.source_denom,
         destinations: msg.destinations,
@@ -135,7 +136,7 @@ pub fn try_store_and_finish_dca_swap(
     if state.swap_status.len() == config.destinations.len() {
         // now that we have attempted all swaps, we can send the destination coins to the destination wallet
         let msg = BankMsg::Send {
-            to_address: config.destination_wallet.to_string(),
+            to_address: config.recipient_address.to_string(),
             amount: state
                 .swap_status
                 .iter()
