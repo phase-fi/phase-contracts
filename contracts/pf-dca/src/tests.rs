@@ -147,11 +147,6 @@ fn dont_cancel_if_unauthorized() {
 #[test]
 fn proper_token_string_to_coin() {
     let token_string = "100uosmo";
-    let _text = "100usomo";
-    // println!("ya moms a hoe");
-    // for mat in Regex::new(r"(?<=\d)(?=\D)|(?<=\D)(?=\d)").unwrap().find_iter(text) {
-    //     println!("mat {:?}", mat);
-    // }
 
     let coin = token_string_to_coin(token_string).unwrap();
 

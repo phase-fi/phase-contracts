@@ -1,6 +1,5 @@
-use cosmwasm_std::{Coin, MessageInfo, Uint128};
+use cosmwasm_std::{Coin, Uint128};
 use cw_utils::Expiration;
-use phase_finance::{error::ContractError, types::DcaConfig};
 
 use std::str::FromStr;
 
