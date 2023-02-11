@@ -15,6 +15,7 @@ use crate::state::STATE;
 use phase_finance::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 
 pub const ADMIN_ADDR: &str = "admin_addr";
+pub const EXECUTOR_ADDR: &str = "executor";
 
 fn do_instantiate() -> OwnedDeps<MockStorage, MockApi, MockQuerier> {
     let mut deps = mock_dependencies();
@@ -23,7 +24,7 @@ fn do_instantiate() -> OwnedDeps<MockStorage, MockApi, MockQuerier> {
 
     let instantiate_msg = InstantiateMsg {
         recipient_address: "osmo123".to_string(),
-        executor_address: "executor".to_string(),
+        executor_address: EXECUTOR_ADDR.to_string(),
         strategy_type: StrategyType::Linear,
         destinations: vec![
             CoinWeight {
@@ -64,7 +65,7 @@ fn proper_initialization() {
 
     let msg = InstantiateMsg {
         recipient_address: "osmo123".to_string(),
-        executor_address: "osmo123".to_string(),
+        executor_address: EXECUTOR_ADDR.to_string(),
         strategy_type: StrategyType::Linear,
         destinations: vec![CoinWeight {
             denom: "uion".to_string(),
@@ -98,7 +99,7 @@ fn proper_execution() {
     let res = execute(
         deps.as_mut(),
         env,
-        mock_info("creator", &coins(100, "uion")),
+        mock_info(EXECUTOR_ADDR, &coins(100, "uion")),
         ExecuteMsg::PerformDca {},
     )
     .unwrap();

@@ -6,7 +6,7 @@ use cosmwasm_std::{
 use phase_finance::constants::DCA_SWAP_ID;
 use phase_finance::error::ContractError;
 
-use crate::helpers::{get_expiration_time, verify_sender};
+use crate::helpers::get_expiration_time;
 use crate::state::{CONFIG, STATE};
 
 pub fn try_cancel_dca(
@@ -15,7 +15,7 @@ pub fn try_cancel_dca(
     info: MessageInfo,
 ) -> Result<Response, ContractError> {
     let config = CONFIG.load(deps.storage)?;
-    verify_sender(&config, &info)?;
+    ensure_eq!(config.owner, info.sender, ContractError::Unauthorized {});
 
     let balances = deps.querier.query_all_balances(env.contract.address)?;
     if balances.is_empty() {
@@ -34,7 +34,7 @@ pub fn try_cancel_dca(
 
 pub fn pause_dca(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
     let config = CONFIG.load(deps.storage)?;
-    verify_sender(&config, &info)?;
+    ensure_eq!(config.owner, info.sender, ContractError::Unauthorized {});
 
     STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
         state.paused = true;
@@ -46,7 +46,7 @@ pub fn pause_dca(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractE
 
 pub fn resume_dca(deps: DepsMut, env: Env, info: MessageInfo) -> Result<Response, ContractError> {
     let config = CONFIG.load(deps.storage)?;
-    verify_sender(&config, &info)?;
+    ensure_eq!(config.owner, info.sender, ContractError::Unauthorized {});
 
     let state = STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
         if state.next_swap.is_expired(&env.block) {
