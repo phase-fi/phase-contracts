@@ -205,14 +205,14 @@ pub fn process_dca_swap_response(
         .iter()
         .find(|attr| attr.key == "tokens_out");
     if tokens_out_attr.is_none() {
-        return try_store_and_finish_dca_swap(deps, env, Option::None);
+        return try_store_and_finish_dca_swap(deps, env, None);
     }
     let token_out = tokens_out_attr.unwrap().value.to_string();
 
     try_store_and_finish_dca_swap(
         deps,
         env.clone(),
-        Option::Some(SwapEvent {
+        Some(SwapEvent {
             executed: true,
             token_in: token_string_to_coin(&token_in),
             effective_token_out: token_string_to_coin(&token_out),
