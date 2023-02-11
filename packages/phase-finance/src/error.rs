@@ -22,6 +22,9 @@ pub enum ContractError {
     #[error("DCA strategy is paused")]
     DcaPaused,
 
+    #[error("DCA strategy is not paused")]
+    DcaNotPaused,
+
     #[error("Reached max trade limit")]
     MaxTradeLimit {},
 

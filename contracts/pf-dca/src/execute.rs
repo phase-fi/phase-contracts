@@ -34,6 +34,8 @@ pub fn try_cancel_dca(
 
 pub fn pause_dca(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractError> {
     let config = CONFIG.load(deps.storage)?;
+    let state = STATE.load(deps.storage)?;
+    ensure!(!state.paused, ContractError::DcaPaused);
     ensure_eq!(config.owner, info.sender, ContractError::Unauthorized {});
 
     STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {
@@ -46,6 +48,8 @@ pub fn pause_dca(deps: DepsMut, info: MessageInfo) -> Result<Response, ContractE
 
 pub fn resume_dca(deps: DepsMut, env: Env, info: MessageInfo) -> Result<Response, ContractError> {
     let config = CONFIG.load(deps.storage)?;
+    let state = STATE.load(deps.storage)?;
+    ensure!(state.paused, ContractError::DcaNotPaused);
     ensure_eq!(config.owner, info.sender, ContractError::Unauthorized {});
 
     let state = STATE.update(deps.storage, |mut state| -> Result<_, ContractError> {

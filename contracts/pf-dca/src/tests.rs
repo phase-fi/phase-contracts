@@ -1,3 +1,4 @@
+use anyhow::ensure;
 use cosmwasm_std::testing::{
     mock_dependencies, mock_env, mock_info, MockApi, MockQuerier, MockStorage,
 };
@@ -142,6 +143,106 @@ fn dont_cancel_if_unauthorized() {
     .unwrap_err();
 
     assert_eq!(res.to_string(), "Unauthorized");
+}
+
+#[test]
+fn should_be_able_to_pause() {
+    let mut deps = do_instantiate();
+
+    let env = mock_env();
+
+    execute(
+        deps.as_mut(),
+        env.clone(),
+        mock_info(ADMIN_ADDR, &[]),
+        ExecuteMsg::PauseDca {},
+    )
+    .unwrap();
+
+    let state = STATE.load(deps.as_ref().storage).unwrap();
+
+    assert!(state.paused);
+}
+
+#[test]
+fn should_be_able_to_resume_if_paused() {
+    let mut deps = do_instantiate();
+
+    let env = mock_env();
+
+    execute(
+        deps.as_mut(),
+        env.clone(),
+        mock_info(ADMIN_ADDR, &[]),
+        ExecuteMsg::PauseDca {},
+    )
+    .unwrap();
+
+    let state = STATE.load(deps.as_ref().storage).unwrap();
+
+    assert!(state.paused);
+
+    execute(
+        deps.as_mut(),
+        env,
+        mock_info(ADMIN_ADDR, &[]),
+        ExecuteMsg::ResumeDca {},
+    )
+    .unwrap();
+
+    let state = STATE.load(deps.as_ref().storage).unwrap();
+
+    assert!(!state.paused);
+}
+
+#[test]
+fn cannot_be_paused_if_is_already_paused() {
+    let mut deps = do_instantiate();
+
+    let env = mock_env();
+
+    execute(
+        deps.as_mut(),
+        env.clone(),
+        mock_info(ADMIN_ADDR, &[]),
+        ExecuteMsg::PauseDca {},
+    )
+    .unwrap();
+
+    let state = STATE.load(deps.as_ref().storage).unwrap();
+
+    assert!(state.paused);
+
+    let err = execute(
+        deps.as_mut(),
+        env,
+        mock_info(ADMIN_ADDR, &[]),
+        ExecuteMsg::PauseDca {},
+    )
+    .unwrap_err();
+
+    assert_eq!(err.to_string(), "DCA strategy is paused");
+}
+
+#[test]
+fn cannot_be_resume_if_is_already_resumed() {
+    let mut deps = do_instantiate();
+
+    let env = mock_env();
+
+    let state = STATE.load(deps.as_ref().storage).unwrap();
+
+    assert!(!state.paused);
+
+    let err = execute(
+        deps.as_mut(),
+        env,
+        mock_info(ADMIN_ADDR, &[]),
+        ExecuteMsg::ResumeDca {},
+    )
+    .unwrap_err();
+
+    assert_eq!(err.to_string(), "DCA strategy is not paused");
 }
 
 #[test]
