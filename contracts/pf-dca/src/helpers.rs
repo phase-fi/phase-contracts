@@ -9,7 +9,7 @@ pub fn get_expiration_time(exp: Expiration) -> u64 {
 }
 
 pub fn token_string_to_coin(token_string: &str) -> Option<Coin> {
-    if token_string.len() == 0 {
+    if token_string.is_empty() {
         return None;
     }
 
