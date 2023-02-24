@@ -59,7 +59,7 @@ impl PhaseFinanceSuite {
                 deployer.clone(),
                 &init_msg.unwrap_or(DCAInstantiateMsg {
                     recipient_address: user.to_string(),
-                    executor_address: executor.to_string(),
+                    executor_address: Some(executor.to_string()),
                     router_contract: router.to_string(),
                     strategy_type: StrategyType::Linear,
                     max_slippage: Decimal::from_ratio(1u128, 100u128),

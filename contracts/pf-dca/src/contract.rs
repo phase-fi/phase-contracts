@@ -7,6 +7,7 @@ use cosmwasm_std::{
 };
 
 use cw2::set_contract_version;
+use cw_denom::validate_native_denom;
 use cw_utils::must_pay;
 
 use crate::execute::{pause_dca, resume_dca, try_cancel_dca, try_perform_dca};
@@ -49,11 +50,21 @@ pub fn instantiate(
         });
     }
 
+    let executor_address = match msg.executor_address {
+        Some(executor_address) => deps.api.addr_validate(&executor_address)?.to_string(),
+        None => info.sender.to_string(),
+    };
+
+    msg.destinations.iter().for_each(|destination| {
+        validate_native_denom(destination.denom.clone())
+            .expect(format!("invalid denom: {}", destination.denom).as_str());
+    });
+
     // store config for this DCA
     let config = DcaConfig {
+        executor_address,
         owner: info.sender.to_string(),
-        recipient_address: msg.recipient_address,
-        executor_address: deps.api.addr_canonicalize(&msg.executor_address)?,
+        recipient_address: deps.api.addr_validate(&msg.recipient_address)?.to_string(),
         strategy_type: msg.strategy_type,
         source_denom: msg.source_denom,
         destinations: msg.destinations,

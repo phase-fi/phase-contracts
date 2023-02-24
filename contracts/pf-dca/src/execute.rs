@@ -77,8 +77,8 @@ pub fn try_perform_dca(
     let state = STATE.load(deps.storage)?;
 
     ensure_eq!(
-        deps.api.addr_humanize(&config.executor_address)?,
-        info.sender,
+        config.executor_address,
+        info.sender.to_string(),
         ContractError::Unauthorized {}
     );
 
