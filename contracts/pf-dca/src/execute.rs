@@ -78,7 +78,7 @@ pub fn try_perform_dca(
 
     ensure_eq!(
         config.executor_address,
-        info.sender.to_string(),
+        info.sender,
         ContractError::Unauthorized {}
     );
 
