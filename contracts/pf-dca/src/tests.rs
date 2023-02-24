@@ -6,6 +6,7 @@ use cosmwasm_std::{
     coins, from_binary, BlockInfo, Coin, Decimal, Env, OwnedDeps, StdResult, Timestamp, Uint128,
 };
 
+use cw_denom::DenomError;
 use cw_utils::Duration;
 use phase_finance::types::{CoinWeight, StrategyType};
 
@@ -115,7 +116,7 @@ fn should_fail_because_wrong_denom() {
     let info = mock_info("creator", &coins(100, "uosmo"));
 
     let err = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap_err();
-    assert_eq!(err.to_string(), "invalid denom 43Denom: NonAlphabeticAscii");
+    assert_eq!(err.to_string(), DenomError::NonAlphabeticAscii.to_string());
 }
 
 #[test]

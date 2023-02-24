@@ -70,10 +70,9 @@ pub fn instantiate(
         None => info.sender.to_string(),
     };
 
-    msg.destinations.iter().for_each(|destination| {
-        validate_native_denom(destination.denom.clone())
-            .expect(format!("invalid denom: {}", destination.denom).as_str());
-    });
+    for destination in msg.destinations.iter() {
+        validate_native_denom(destination.denom.clone())?;
+    }
 
     // store config for this DCA
     let config = DcaConfig {
