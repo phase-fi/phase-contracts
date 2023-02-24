@@ -43,6 +43,8 @@ fn do_instantiate() -> OwnedDeps<MockStorage, MockApi, MockQuerier> {
         swap_interval: Duration::Time(1),
         source_denom: "uosmo".to_string(),
         router_contract: "osmoabc".to_string(),
+        platform_fee: Uint128::zero(),
+        platform_fee_recipient: "osmo123".to_string(),
     };
 
     instantiate(deps.as_mut(), env, info, instantiate_msg).unwrap();
@@ -78,6 +80,8 @@ fn proper_initialization() {
         swap_interval: Duration::Height(100_000_000_000),
         source_denom: "uosmo".to_string(),
         router_contract: "osmoabc".to_string(),
+        platform_fee: Uint128::zero(),
+        platform_fee_recipient: "osmo123".to_string(),
     };
 
     let info = mock_info("creator", &coins(100, "uosmo"));
@@ -94,6 +98,8 @@ fn should_fail_because_wrong_denom() {
         recipient_address: "osmo123".to_string(),
         executor_address: Some(EXECUTOR_ADDR.to_string()),
         strategy_type: StrategyType::Linear,
+        platform_fee: Uint128::zero(),
+        platform_fee_recipient: "osmo123".to_string(),
         destinations: vec![CoinWeight {
             denom: "43Denom".to_string(),
             weight: Uint128::from(100u128),
@@ -133,6 +139,8 @@ fn dont_init_with_too_many_destinations() {
         swap_interval: Duration::Height(100_000_000_000),
         source_denom: "uosmo".to_string(),
         router_contract: "osmoabc".to_string(),
+        platform_fee: Uint128::zero(),
+        platform_fee_recipient: "osmo123".to_string(),
     };
 
     let info = mock_info("creator", &coins(100, "uosmo"));
@@ -141,6 +149,45 @@ fn dont_init_with_too_many_destinations() {
     match res {
         phase_finance::error::ContractError::CustomError { val } => {
             assert_eq!(val, "Number of destination tokens is more than 20")
+        }
+        _ => panic!("Unexpected error: {:?}", res),
+    }
+}
+
+#[test]
+fn dont_init_with_bad_funds_with_platform_fee() {
+    let mut deps = mock_dependencies();
+
+    let msg = InstantiateMsg {
+        recipient_address: "osmo123".to_string(),
+        executor_address: Some(EXECUTOR_ADDR.to_string()),
+        strategy_type: StrategyType::Linear,
+        destinations: vec![
+            CoinWeight {
+                denom: "uion".to_string(),
+                weight: Uint128::from(100u128),
+            };
+            21
+        ],
+        max_slippage: Decimal::from_ratio(1u128, 100u128),
+        amount_per_trade: Uint128::from(10u128),
+        num_trades: Uint128::from(10u128),
+        swap_interval: Duration::Height(100_000_000_000),
+        source_denom: "uosmo".to_string(),
+        router_contract: "osmoabc".to_string(),
+        platform_fee: Uint128::one(),
+        platform_fee_recipient: "osmo123".to_string(),
+    };
+
+    let info = mock_info("creator", &coins(100, "uosmo"));
+
+    let res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap_err();
+    match res {
+        phase_finance::error::ContractError::CustomError { val } => {
+            assert_eq!(
+                val,
+                "Amount deposited does not match exactly expected: <101> != actual: <100>"
+            )
         }
         _ => panic!("Unexpected error: {:?}", res),
     }

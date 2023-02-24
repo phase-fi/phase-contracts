@@ -19,6 +19,11 @@ pub struct InstantiateMsg {
 
     pub router_contract: String,
     pub source_denom: String,
+
+    // platform fee configurable by sender
+    // platform fee paid in source_denom
+    pub platform_fee: Uint128,
+    pub platform_fee_recipient: String,
 }
 
 #[cw_serde]

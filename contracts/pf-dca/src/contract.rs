@@ -2,7 +2,7 @@
 use cosmwasm_std::entry_point;
 
 use cosmwasm_std::{
-    to_binary, BankMsg, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdError,
+    to_binary, BankMsg, Binary, Coin, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdError,
     StdResult, SubMsgResponse, Uint128,
 };
 
@@ -39,20 +39,18 @@ pub fn instantiate(
 
     let funds = must_pay(&info, &msg.source_denom)?;
 
-    // check that amount deposited is correct for dca params
-    if msg
+    let expected_funds = msg
         .amount_per_trade
         .checked_mul(msg.num_trades)
         .expect("overflow")
-        .ne(&funds)
-    {
+        .checked_add(msg.platform_fee)
+        .expect("overflow");
+    // check that amount deposited is correct for dca params
+    if expected_funds.ne(&funds) {
         return Err(ContractError::CustomError {
             val: format!(
-                "Amount deposited does not match exactly <{}> != <{}>",
-                msg.amount_per_trade
-                    .checked_mul(msg.num_trades)
-                    .expect("overflow"),
-                funds
+                "Amount deposited does not match exactly expected: <{}> != actual: <{}>",
+                expected_funds, funds
             ),
         });
     }
@@ -83,7 +81,7 @@ pub fn instantiate(
         owner: info.sender.to_string(),
         recipient_address: deps.api.addr_validate(&msg.recipient_address)?.to_string(),
         strategy_type: msg.strategy_type,
-        source_denom: msg.source_denom,
+        source_denom: msg.source_denom.clone(),
         destinations: msg.destinations,
         max_slippage: msg.max_slippage,
         amount_per_trade: msg.amount_per_trade,
@@ -102,7 +100,22 @@ pub fn instantiate(
     CONFIG.save(deps.storage, &config)?;
     STATE.save(deps.storage, &state)?;
 
+    let mut msgs = vec![];
+    if !msg.platform_fee.is_zero() {
+        msgs.push(BankMsg::Send {
+            to_address: deps
+                .api
+                .addr_validate(&msg.platform_fee_recipient)?
+                .to_string(),
+            amount: vec![Coin {
+                amount: msg.platform_fee,
+                denom: msg.source_denom,
+            }],
+        });
+    }
+
     Ok(Response::new()
+        .add_messages(msgs)
         .add_attribute("method", "instantiate")
         .add_attribute("creator", info.sender))
 }

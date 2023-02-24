@@ -77,6 +77,8 @@ impl PhaseFinanceSuite {
                             weight: Uint128::from(100u128),
                         },
                     ],
+                    platform_fee: Uint128::zero(),
+                    platform_fee_recipient: "osmo123".to_string(),
                 }),
                 &funds.unwrap_or(vec![coin(100, DENOM)]),
                 "dca_contract",
