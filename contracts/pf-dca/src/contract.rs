@@ -2,8 +2,8 @@
 use cosmwasm_std::entry_point;
 
 use cosmwasm_std::{
-    to_binary, BankMsg, Binary, Deps, DepsMut, Env, MessageInfo, Reply, Response, StdError,
-    StdResult, SubMsgResponse, Uint128,
+    to_binary, BankMsg, Binary, Coin, Decimal, Deps, DepsMut, Env, MessageInfo, Reply, Response,
+    StdError, StdResult, SubMsgResponse, Uint128,
 };
 
 use cw2::set_contract_version;
@@ -25,6 +25,7 @@ use phase_finance::types::{DcaConfig, State, SwapEvent};
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:phase-finance";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
+const MAX_DESTINATIONS: u8 = 20;
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
@@ -37,15 +38,55 @@ pub fn instantiate(
 
     let funds = must_pay(&info, &msg.source_denom)?;
 
-    // check that amount deposited is correct for dca params
-    if msg
+    let expected_funds = msg
         .amount_per_trade
         .checked_mul(msg.num_trades)
         .expect("overflow")
-        > funds
+        .checked_add(msg.platform_fee)
+        .expect("overflow");
+
+    // check that amount deposited is correct for dca params
+    if expected_funds.ne(&funds) {
+        return Err(ContractError::CustomError {
+            val: format!(
+                "Amount deposited does not match exactly expected: <{expected_funds}> != actual: <{funds}>"
+            ),
+        });
+    }
+
+    // check that number of destination tokens is no more than MAX_DESTINATIONS
+    if msg.destinations.len() > MAX_DESTINATIONS.into() || msg.destinations.is_empty() {
+        return Err(ContractError::CustomError {
+            val: format!(
+                "Number of destination tokens must be between 1 and {MAX_DESTINATIONS}"
+            ),
+        });
+    }
+
+    // validate max_slippage is between 0 and 15%
+    if msg.max_slippage.gt(&Decimal::from_ratio(15u128, 100u128))
+        || msg.max_slippage.lt(&Decimal::zero())
     {
         return Err(ContractError::CustomError {
-            val: "amount deposited does not match amount per trade and num trades".to_string(),
+            val: "Max slippage must be between 0 and 15%".to_string(),
+        });
+    }
+
+    // validate that twap_window_seconds is between 1 and 120 seconds
+    if msg.twap_window_seconds.gt(&120u64) || msg.twap_window_seconds.lt(&1u64) {
+        return Err(ContractError::CustomError {
+            val: "Twap window must be between 1 and 120 seconds".to_string(),
+        });
+    }
+
+    // check that swap_interval is greater than 0
+    let swap_interval_value = match msg.swap_interval {
+        cw_utils::Duration::Height(height) => height,
+        cw_utils::Duration::Time(time) => time,
+    };
+    if swap_interval_value == 0 {
+        return Err(ContractError::CustomError {
+            val: "Swap interval must be greater than 0".to_string(),
         });
     }
 
@@ -53,15 +94,16 @@ pub fn instantiate(
     let config = DcaConfig {
         owner: info.sender.to_string(),
         recipient_address: msg.recipient_address,
-        executor_address: deps.api.addr_canonicalize(&msg.executor_address)?,
+        executor_address: deps.api.addr_validate(&msg.executor_address)?,
         strategy_type: msg.strategy_type,
-        source_denom: msg.source_denom,
+        source_denom: msg.source_denom.clone(),
         destinations: msg.destinations,
         max_slippage: msg.max_slippage,
+        twap_window_seconds: msg.twap_window_seconds,
         amount_per_trade: msg.amount_per_trade,
         num_trades: msg.num_trades,
         swap_interval: msg.swap_interval,
-        router_contract: msg.router_contract,
+        router_contract: deps.api.addr_validate(&msg.router_contract)?,
     };
 
     let state = State {
@@ -74,7 +116,19 @@ pub fn instantiate(
     CONFIG.save(deps.storage, &config)?;
     STATE.save(deps.storage, &state)?;
 
+    let mut msgs = vec![];
+    if !msg.platform_fee.is_zero() {
+        msgs.push(BankMsg::Send {
+            to_address: msg.platform_fee_recipient,
+            amount: vec![Coin {
+                amount: msg.platform_fee,
+                denom: msg.source_denom,
+            }],
+        });
+    }
+
     Ok(Response::new()
+        .add_messages(msgs)
         .add_attribute("method", "instantiate")
         .add_attribute("creator", info.sender))
 }

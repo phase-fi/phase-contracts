@@ -77,7 +77,7 @@ pub fn try_perform_dca(
     let state = STATE.load(deps.storage)?;
 
     ensure_eq!(
-        deps.api.addr_humanize(&config.executor_address)?,
+        config.executor_address,
         info.sender,
         ContractError::Unauthorized {}
     );
@@ -117,11 +117,14 @@ pub fn try_perform_dca(
             };
 
             let msg = WasmMsg::Execute {
-                contract_addr: config.router_contract.clone(),
+                contract_addr: config.router_contract.to_string(),
                 msg: to_binary(&swaprouter::msg::ExecuteMsg::Swap {
                     input_coin: in_funds.clone(),
                     output_denom: d.denom.clone(),
-                    slippage: swaprouter::msg::Slippage::MaxSlippagePercentage(config.max_slippage),
+                    slippage: swaprouter::msg::Slippage::Twap {
+                        slippage_percentage: config.max_slippage,
+                        window_seconds: Option::Some(config.twap_window_seconds),
+                    },
                 })
                 .unwrap(),
                 funds: vec![in_funds],

@@ -16,9 +16,15 @@ pub struct InstantiateMsg {
     pub destinations: Vec<CoinWeight>,
     // slippage is the same for all swaps, can be changed later
     pub max_slippage: Decimal,
+    pub twap_window_seconds: u64,
 
     pub router_contract: String,
     pub source_denom: String,
+
+    // platform fee configurable by sender
+    // platform fee paid in source_denom
+    pub platform_fee: Uint128,
+    pub platform_fee_recipient: String,
 }
 
 #[cw_serde]
