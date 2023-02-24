@@ -20,7 +20,7 @@ pub const EXECUTOR_ADDR: &str = "executor";
 
 fn do_instantiate() -> OwnedDeps<MockStorage, MockApi, MockQuerier> {
     let mut deps = mock_dependencies();
-    let info = mock_info(ADMIN_ADDR, &coins(1000000000, "uosmo"));
+    let info = mock_info(ADMIN_ADDR, &coins(100, "uosmo"));
     let env = mock_env();
 
     let instantiate_msg = InstantiateMsg {
@@ -110,6 +110,40 @@ fn should_fail_because_wrong_denom() {
 
     let err = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap_err();
     assert_eq!(err.to_string(), "invalid denom 43Denom: NonAlphabeticAscii");
+}
+
+#[test]
+fn dont_init_with_too_many_destinations() {
+    let mut deps = mock_dependencies();
+
+    let msg = InstantiateMsg {
+        recipient_address: "osmo123".to_string(),
+        executor_address: Some(EXECUTOR_ADDR.to_string()),
+        strategy_type: StrategyType::Linear,
+        destinations: vec![
+            CoinWeight {
+                denom: "uion".to_string(),
+                weight: Uint128::from(100u128),
+            };
+            21
+        ],
+        max_slippage: Decimal::from_ratio(1u128, 100u128),
+        amount_per_trade: Uint128::from(10u128),
+        num_trades: Uint128::from(10u128),
+        swap_interval: Duration::Height(100_000_000_000),
+        source_denom: "uosmo".to_string(),
+        router_contract: "osmoabc".to_string(),
+    };
+
+    let info = mock_info("creator", &coins(100, "uosmo"));
+
+    let res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap_err();
+    match res {
+        phase_finance::error::ContractError::CustomError { val } => {
+            assert_eq!(val, "Number of destination tokens is more than 20")
+        }
+        _ => panic!("Unexpected error: {:?}", res),
+    }
 }
 
 #[test]

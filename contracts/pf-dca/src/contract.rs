@@ -26,6 +26,7 @@ use phase_finance::types::{DcaConfig, State, SwapEvent};
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:phase-finance";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
+const MAX_DESTINATIONS: u8 = 20;
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
@@ -43,10 +44,26 @@ pub fn instantiate(
         .amount_per_trade
         .checked_mul(msg.num_trades)
         .expect("overflow")
-        > funds
+        .ne(&funds)
     {
         return Err(ContractError::CustomError {
-            val: "amount deposited does not match amount per trade and num trades".to_string(),
+            val: format!(
+                "Amount deposited does not match exactly <{}> != <{}>",
+                msg.amount_per_trade
+                    .checked_mul(msg.num_trades)
+                    .expect("overflow"),
+                funds
+            ),
+        });
+    }
+
+    // check that number of destination tokens is no more than MAX_DESTINATIONS
+    if msg.destinations.len() > MAX_DESTINATIONS.into() {
+        return Err(ContractError::CustomError {
+            val: format!(
+                "Number of destination tokens is more than {}",
+                MAX_DESTINATIONS
+            ),
         });
     }
 
