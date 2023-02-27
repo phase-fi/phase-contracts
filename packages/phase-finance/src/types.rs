@@ -1,5 +1,5 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Coin, Decimal, Uint128, Addr};
+use cosmwasm_std::{Addr, Coin, Decimal, Uint128};
 use cw_utils::{Duration, Expiration};
 
 #[cw_serde]

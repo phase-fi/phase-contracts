@@ -58,9 +58,7 @@ pub fn instantiate(
     // check that number of destination tokens is no more than MAX_DESTINATIONS
     if msg.destinations.len() > MAX_DESTINATIONS.into() || msg.destinations.is_empty() {
         return Err(ContractError::CustomError {
-            val: format!(
-                "Number of destination tokens must be between 1 and {MAX_DESTINATIONS}"
-            ),
+            val: format!("Number of destination tokens must be between 1 and {MAX_DESTINATIONS}"),
         });
     }
 
