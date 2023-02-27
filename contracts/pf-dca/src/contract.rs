@@ -7,6 +7,7 @@ use cosmwasm_std::{
 };
 
 use cw2::set_contract_version;
+use cw_denom::validate_native_denom;
 use cw_utils::must_pay;
 
 use crate::execute::{pause_dca, resume_dca, try_cancel_dca, try_perform_dca};
@@ -90,11 +91,30 @@ pub fn instantiate(
         });
     }
 
+    // check that number of destination tokens is no more than MAX_DESTINATIONS
+    if msg.destinations.len() > MAX_DESTINATIONS.into() {
+        return Err(ContractError::CustomError {
+            val: format!(
+                "Number of destination tokens is more than {}",
+                MAX_DESTINATIONS
+            ),
+        });
+    }
+
+    let executor_address = match msg.executor_address {
+        Some(executor_address) => deps.api.addr_validate(&executor_address)?,
+        None => info.sender.clone(),
+    };
+
+    for destination in msg.destinations.iter() {
+        validate_native_denom(destination.denom.clone())?;
+    }
+
     // store config for this DCA
     let config = DcaConfig {
         owner: info.sender.to_string(),
-        recipient_address: msg.recipient_address,
-        executor_address: deps.api.addr_validate(&msg.executor_address)?,
+        executor_address,
+        recipient_address: deps.api.addr_validate(&msg.recipient_address)?.to_string(),
         strategy_type: msg.strategy_type,
         source_denom: msg.source_denom.clone(),
         destinations: msg.destinations,
@@ -119,7 +139,10 @@ pub fn instantiate(
     let mut msgs = vec![];
     if !msg.platform_fee.is_zero() {
         msgs.push(BankMsg::Send {
-            to_address: msg.platform_fee_recipient,
+            to_address: deps
+                .api
+                .addr_validate(&msg.platform_fee_recipient)?
+                .to_string(),
             amount: vec![Coin {
                 amount: msg.platform_fee,
                 denom: msg.source_denom,

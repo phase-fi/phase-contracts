@@ -7,7 +7,7 @@ use crate::types::{CoinWeight, DcaConfig, State, StrategyType, UpcomingSwapRespo
 #[cw_serde]
 pub struct InstantiateMsg {
     pub recipient_address: String,
-    pub executor_address: String,
+    pub executor_address: Option<String>,
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
     pub num_trades: Uint128,
@@ -35,7 +35,6 @@ pub enum ExecuteMsg {
     ResumeDca {},
     /// cancel the dca
     CancelDca {},
-    // ClaimFunds {},
 }
 
 #[cw_serde]

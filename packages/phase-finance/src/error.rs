@@ -1,4 +1,5 @@
 use cosmwasm_std::StdError;
+use cw_denom::DenomError;
 use cw_utils::PaymentError;
 use thiserror::Error;
 
@@ -12,6 +13,9 @@ pub enum ContractError {
 
     #[error("Unauthorized")]
     Unauthorized {},
+
+    #[error("{0}")]
+    InvalidDenom(#[from] DenomError),
 
     #[error("No balance")]
     NoBalance {},

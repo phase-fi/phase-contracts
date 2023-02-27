@@ -1,4 +1,3 @@
-
 use cosmwasm_std::testing::{
     mock_dependencies, mock_env, mock_info, MockApi, MockQuerier, MockStorage,
 };
@@ -6,6 +5,7 @@ use cosmwasm_std::{
     coins, from_binary, BlockInfo, Coin, Decimal, Env, OwnedDeps, StdResult, Timestamp, Uint128,
 };
 
+use cw_denom::DenomError;
 use cw_utils::Duration;
 use phase_finance::types::{CoinWeight, StrategyType};
 
@@ -25,7 +25,7 @@ fn do_instantiate() -> OwnedDeps<MockStorage, MockApi, MockQuerier> {
 
     let instantiate_msg = InstantiateMsg {
         recipient_address: "osmo123".to_string(),
-        executor_address: EXECUTOR_ADDR.to_string(),
+        executor_address: Some(EXECUTOR_ADDR.to_string()),
         strategy_type: StrategyType::Linear,
         destinations: vec![
             CoinWeight {
@@ -69,7 +69,7 @@ fn proper_initialization() {
 
     let msg = InstantiateMsg {
         recipient_address: "osmo123".to_string(),
-        executor_address: EXECUTOR_ADDR.to_string(),
+        executor_address: Some(EXECUTOR_ADDR.to_string()),
         strategy_type: StrategyType::Linear,
         destinations: vec![CoinWeight {
             denom: "uion".to_string(),
@@ -93,42 +93,32 @@ fn proper_initialization() {
 }
 
 #[test]
-fn proper_initialization_with_platform_fee() {
+fn should_fail_because_wrong_denom() {
     let mut deps = mock_dependencies();
 
     let msg = InstantiateMsg {
         recipient_address: "osmo123".to_string(),
-        executor_address: EXECUTOR_ADDR.to_string(),
+        executor_address: Some(EXECUTOR_ADDR.to_string()),
         strategy_type: StrategyType::Linear,
+        platform_fee: Uint128::zero(),
+        platform_fee_recipient: "osmo123".to_string(),
         destinations: vec![CoinWeight {
-            denom: "uion".to_string(),
+            denom: "43Denom".to_string(),
             weight: Uint128::from(100u128),
         }],
         max_slippage: Decimal::from_ratio(1u128, 100u128),
+        twap_window_seconds: 1,
         amount_per_trade: Uint128::from(10u128),
         num_trades: Uint128::from(10u128),
         swap_interval: Duration::Height(100_000_000_000),
-        twap_window_seconds: 1,
         source_denom: "uosmo".to_string(),
         router_contract: "osmoabc".to_string(),
-        platform_fee: Uint128::one(),
-        platform_fee_recipient: "osmo1234".to_string(),
     };
 
-    let info = mock_info("creator", &coins(101, "uosmo"));
+    let info = mock_info("creator", &coins(100, "uosmo"));
 
-    let res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
-    assert_eq!(1, res.messages.len());
-    match &res.messages.get(0).unwrap().msg {
-        cosmwasm_std::CosmosMsg::Bank(bank_msg) => match bank_msg {
-            cosmwasm_std::BankMsg::Send { to_address, amount } => {
-                assert_eq!("osmo1234", to_address);
-                assert_eq!(1, amount.len());
-            }
-            _ => assert!(false, "expected BankMsg::Send in response"),
-        },
-        _ => assert!(false, "expected BankMsg in response"),
-    }
+    let err = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap_err();
+    assert_eq!(err.to_string(), DenomError::NonAlphabeticAscii.to_string());
 }
 
 #[test]
@@ -137,7 +127,7 @@ fn dont_init_with_too_many_destinations() {
 
     let msg = InstantiateMsg {
         recipient_address: "osmo123".to_string(),
-        executor_address: EXECUTOR_ADDR.to_string(),
+        executor_address: Some(EXECUTOR_ADDR.to_string()),
         strategy_type: StrategyType::Linear,
         destinations: vec![
             CoinWeight {
@@ -174,7 +164,7 @@ fn dont_init_with_bad_funds_with_platform_fee() {
 
     let msg = InstantiateMsg {
         recipient_address: "osmo123".to_string(),
-        executor_address: EXECUTOR_ADDR.to_string(),
+        executor_address: Some(EXECUTOR_ADDR.to_string()),
         strategy_type: StrategyType::Linear,
         destinations: vec![
             CoinWeight {
@@ -205,6 +195,45 @@ fn dont_init_with_bad_funds_with_platform_fee() {
             )
         }
         _ => panic!("Unexpected error: {:?}", res),
+    }
+}
+
+#[test]
+fn proper_initialization_with_platform_fee() {
+    let mut deps = mock_dependencies();
+
+    let msg = InstantiateMsg {
+        recipient_address: "osmo123".to_string(),
+        executor_address: Option::Some(EXECUTOR_ADDR.to_string()),
+        strategy_type: StrategyType::Linear,
+        destinations: vec![CoinWeight {
+            denom: "uion".to_string(),
+            weight: Uint128::from(100u128),
+        }],
+        max_slippage: Decimal::from_ratio(1u128, 100u128),
+        amount_per_trade: Uint128::from(10u128),
+        num_trades: Uint128::from(10u128),
+        swap_interval: Duration::Height(100_000_000_000),
+        twap_window_seconds: 1,
+        source_denom: "uosmo".to_string(),
+        router_contract: "osmoabc".to_string(),
+        platform_fee: Uint128::one(),
+        platform_fee_recipient: "osmo1234".to_string(),
+    };
+
+    let info = mock_info("creator", &coins(101, "uosmo"));
+
+    let res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
+    assert_eq!(1, res.messages.len());
+    match &res.messages.get(0).unwrap().msg {
+        cosmwasm_std::CosmosMsg::Bank(bank_msg) => match bank_msg {
+            cosmwasm_std::BankMsg::Send { to_address, amount } => {
+                assert_eq!("osmo1234", to_address);
+                assert_eq!(1, amount.len());
+            }
+            _ => assert!(false, "expected BankMsg::Send in response"),
+        },
+        _ => assert!(false, "expected BankMsg in response"),
     }
 }
 
