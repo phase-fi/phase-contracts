@@ -134,7 +134,7 @@ fn dont_init_with_too_many_destinations() {
                 denom: "uion".to_string(),
                 weight: Uint128::from(100u128),
             };
-            21
+            26
         ],
         max_slippage: Decimal::from_ratio(1u128, 100u128),
         twap_window_seconds: 1,
@@ -152,7 +152,7 @@ fn dont_init_with_too_many_destinations() {
     let res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap_err();
     match res {
         phase_finance::error::ContractError::CustomError { val } => {
-            assert_eq!(val, "Number of destination tokens must be between 1 and 20")
+            assert_eq!(val, "Number of destination tokens must be between 1 and 25")
         }
         _ => panic!("Unexpected error: {:?}", res),
     }

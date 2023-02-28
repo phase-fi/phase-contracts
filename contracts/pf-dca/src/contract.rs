@@ -26,7 +26,13 @@ use phase_finance::types::{DcaConfig, State, SwapEvent};
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:phase-finance";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
-const MAX_DESTINATIONS: u8 = 20;
+
+// the maximum number of destination tokens to dca into
+const MAX_DESTINATIONS: u8 = 25;
+// the maximum value for max_slippage on swaps
+const MAX_SLIPPAGE_PERCENTAGE: u128 = 15;
+// the maximum twap window in seconds for swaps
+const MAX_TWAP_WINDOW_SECONDS: u64 = 120;
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
@@ -62,19 +68,20 @@ pub fn instantiate(
         });
     }
 
-    // validate max_slippage is between 0 and 15%
-    if msg.max_slippage.gt(&Decimal::from_ratio(15u128, 100u128))
-        || msg.max_slippage.lt(&Decimal::zero())
+    // validate max_slippage is less than MAX_SLIPPAGE_PERCENTAGE%
+    if msg
+        .max_slippage
+        .gt(&Decimal::from_ratio(MAX_SLIPPAGE_PERCENTAGE, 100u128))
     {
         return Err(ContractError::CustomError {
-            val: "Max slippage must be between 0 and 15%".to_string(),
+            val: format!("Max slippage must be between 0% and {MAX_SLIPPAGE_PERCENTAGE}%"),
         });
     }
 
-    // validate that twap_window_seconds is between 1 and 120 seconds
-    if msg.twap_window_seconds.gt(&120u64) || msg.twap_window_seconds.lt(&1u64) {
+    // validate that twap_window_seconds is between 1 and MAX_TWAP_WINDOW_SECONDS seconds
+    if msg.twap_window_seconds.gt(&MAX_TWAP_WINDOW_SECONDS) || msg.twap_window_seconds.lt(&1u64) {
         return Err(ContractError::CustomError {
-            val: "Twap window must be between 1 and 120 seconds".to_string(),
+            val: format!("Twap window must be between 1 and {MAX_TWAP_WINDOW_SECONDS} seconds"),
         });
     }
 
@@ -86,16 +93,6 @@ pub fn instantiate(
     if swap_interval_value == 0 {
         return Err(ContractError::CustomError {
             val: "Swap interval must be greater than 0".to_string(),
-        });
-    }
-
-    // check that number of destination tokens is no more than MAX_DESTINATIONS
-    if msg.destinations.len() > MAX_DESTINATIONS.into() {
-        return Err(ContractError::CustomError {
-            val: format!(
-                "Number of destination tokens is more than {}",
-                MAX_DESTINATIONS
-            ),
         });
     }
 
