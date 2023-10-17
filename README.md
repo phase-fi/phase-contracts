@@ -10,4 +10,4 @@ Run the following two commands to get the repo ready for running tests/deploying
 `RUSTFLAGS='-C link-arg=-s' cargo wasm-router`
 
 ## Testing
-`cargo test`
+`cargo test -p pf-dca`

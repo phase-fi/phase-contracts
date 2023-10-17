@@ -1,15 +1,5 @@
-use cosmwasm_std::{Coin, MessageInfo, Uint128};
+use cosmwasm_std::{coin, Coin};
 use cw_utils::Expiration;
-use phase_finance::{error::ContractError, types::DcaConfig};
-
-use std::str::FromStr;
-
-pub fn verify_sender(config: &DcaConfig, info: &MessageInfo) -> Result<(), ContractError> {
-    if info.sender != config.owner && info.sender != config.destination_wallet {
-        return Err(ContractError::Unauthorized {});
-    }
-    Ok(())
-}
 
 pub fn get_expiration_time(exp: Expiration) -> u64 {
     match exp {
@@ -19,6 +9,10 @@ pub fn get_expiration_time(exp: Expiration) -> u64 {
 }
 
 pub fn token_string_to_coin(token_string: &str) -> Option<Coin> {
+    if token_string.is_empty() {
+        return None;
+    }
+
     // lets scan token string until we find a character that isnt a number
     let number_part = token_string
         .chars()
@@ -31,8 +25,11 @@ pub fn token_string_to_coin(token_string: &str) -> Option<Coin> {
         .skip(number_part.len())
         .collect::<String>();
 
-    Option::Some(Coin {
-        amount: Uint128::from_str(&number_part).unwrap(),
-        denom: denom_part,
-    })
+    let amount = number_part.trim().parse::<u128>();
+
+    if amount.is_err() {
+        return None;
+    }
+
+    return Some(coin(amount.unwrap(), denom_part.trim()));
 }

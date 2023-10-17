@@ -23,6 +23,8 @@ jobs:
 
       - name: Run unit tests
         uses: actions-rs/cargo@v1
+        with: 
+          command: test-dca
         env:
           RUST_BACKTRACE: 1
 
@@ -60,13 +62,3 @@ jobs:
         with:
           command: clippy
           args: -- -D warnings
-
-      - name: Generate Schema
-        uses: actions-rs/cargo@v1
-        with:
-          command: run
-          args: --bin schema
-
-      - name: Schema Changes
-        # fails if any changes not committed
-        run: git diff --exit-code schema

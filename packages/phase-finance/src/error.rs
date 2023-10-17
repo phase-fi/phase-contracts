@@ -1,4 +1,5 @@
 use cosmwasm_std::StdError;
+use cw_denom::DenomError;
 use cw_utils::PaymentError;
 use thiserror::Error;
 
@@ -13,6 +14,9 @@ pub enum ContractError {
     #[error("Unauthorized")]
     Unauthorized {},
 
+    #[error("{0}")]
+    InvalidDenom(#[from] DenomError),
+
     #[error("No balance")]
     NoBalance {},
 
@@ -21,6 +25,12 @@ pub enum ContractError {
 
     #[error("DCA strategy is paused")]
     DcaPaused,
+
+    #[error("DCA strategy is not paused")]
+    DcaNotPaused,
+
+    #[error("Reached max trade limit")]
+    MaxTradeLimit {},
 
     #[error("Custom Error val: {val:?}")]
     CustomError { val: String },

@@ -97,6 +97,7 @@ pub fn calculate_min_output_from_twap(
     input_token: Coin,
     output_denom: String,
     now: Timestamp,
+    window: Option<u64>,
     percentage_impact: Decimal,
 ) -> Result<Coin, ContractError> {
     // get trade route
@@ -118,7 +119,8 @@ pub fn calculate_min_output_from_twap(
     //  price of <out> is X<in> (i.e.: price of atom is Xosmo)
     let mut sell_denom = input_token.denom;
 
-    let start_time = now.minus_seconds(1);
+    // if duration is not provided, default to 1h
+    let start_time = now.minus_seconds(window.unwrap_or(3600));
     let start_time = OsmosisTimestamp {
         seconds: start_time.seconds() as i64,
         nanos: 0_i32,
@@ -143,22 +145,25 @@ pub fn calculate_min_output_from_twap(
                 Some(start_time.clone()),
                 Some(end_time.clone()),
             )
-            .map_err(|_e| ContractError::CustomError {
-                val: format!("failed to fetch twap price for {route_part:?} in {sell_denom}"),
+            .map_err(|_e| ContractError::TwapNotFound {
+                denom: route_part.token_out_denom.clone(),
+                sell_denom,
+                pool_id: route_part.pool_id,
             })?
             .arithmetic_twap;
 
         deps.api.debug(&format!("twap = {twap}"));
 
-        let twap: Decimal = twap.parse().map_err(|_e| ContractError::CustomError {
-            val: "Invalid twap value received from the chain".to_string(),
-        })?;
+        let twap: Decimal = twap
+            .parse()
+            .map_err(|_e| ContractError::InvalidTwapString { twap })?;
 
-        twap_price = twap_price
-            .checked_mul(twap)
-            .map_err(|_e| ContractError::CustomError {
-                val: format!("Invalid value for twap price: {twap_price} * {twap}"),
-            })?;
+        twap_price =
+            twap_price
+                .checked_mul(twap)
+                .map_err(|_e| ContractError::InvalidTwapOperation {
+                    operation: format!("{twap_price} * {twap}"),
+                })?;
 
         // the current output is the input for the next route_part
         sell_denom = route_part.token_out_denom;

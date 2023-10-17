@@ -1,11 +1,12 @@
 use cosmwasm_schema::cw_serde;
-use cosmwasm_std::{Coin, Decimal, Uint128};
+use cosmwasm_std::{Addr, Coin, Decimal, Uint128};
 use cw_utils::{Duration, Expiration};
 
 #[cw_serde]
 pub struct DcaConfig {
     pub owner: String,
-    pub destination_wallet: String,
+    pub recipient_address: String,
+    pub executor_address: Addr,
     pub strategy_type: StrategyType,
     pub amount_per_trade: Uint128,
     pub num_trades: Uint128,
@@ -15,8 +16,9 @@ pub struct DcaConfig {
     pub destinations: Vec<CoinWeight>,
     // slippage is the same for all swaps, but can be changed later
     pub max_slippage: Decimal,
+    pub twap_window_seconds: u64,
 
-    pub router_contract: String,
+    pub router_contract: Addr,
     // croncat to be added once their contracts are on mainnet
 }
 

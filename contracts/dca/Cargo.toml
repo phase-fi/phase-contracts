@@ -29,6 +29,7 @@ cosmwasm-storage = "1.1.5"
 cw-storage-plus = "1.0.1"
 cw2 = "1.0.1"
 cw-utils = "1.0.1"
+cw-denom = "2.0.2"
 osmosis-std = "0.1.7"
 strum = "0.24.1"
 strum_macros = "0.24.2"
@@ -43,3 +44,6 @@ regex = "1.7.0"
 cw-multi-test = "0.16"
 derivative = "2"
 anyhow = "1"
+
+[profile.release]
+overflow-checks = true

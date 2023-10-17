@@ -9,15 +9,18 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub enum Slippage {
-    MaxSlippagePercentage(Decimal),
+    Twap {
+        window_seconds: Option<u64>,
+        slippage_percentage: Decimal,
+    },
     MinOutputAmount(Uint128),
 }
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    TransferOwnership {
-        new_owner: String,
-    },
+    /// The contract's owner determines how can update the routes. This method
+    /// allows the owner to be transfered to someone else.
+    TransferOwnership { new_owner: String },
     SetRoute {
         input_denom: String,
         output_denom: String,
