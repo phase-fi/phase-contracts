@@ -9,33 +9,45 @@
     "required": [
       "amount_per_trade",
       "destinations",
-      "executor_address",
       "max_slippage",
       "num_trades",
+      "platform_fee",
+      "platform_fee_recipient",
       "recipient_address",
       "router_contract",
       "source_denom",
       "strategy_type",
-      "swap_interval"
+      "swap_interval",
+      "twap_window_seconds"
     ],
     "properties": {
       "amount_per_trade": {
         "$ref": "#/definitions/Uint128"
       },
       "destinations": {
+        "description": "can DCA into multiple coins",
         "type": "array",
         "items": {
           "$ref": "#/definitions/CoinWeight"
         }
       },
       "executor_address": {
-        "type": "string"
+        "type": [
+          "string",
+          "null"
+        ]
       },
       "max_slippage": {
         "$ref": "#/definitions/Decimal"
       },
       "num_trades": {
         "$ref": "#/definitions/Uint128"
+      },
+      "platform_fee": {
+        "$ref": "#/definitions/Uint128"
+      },
+      "platform_fee_recipient": {
+        "type": "string"
       },
       "recipient_address": {
         "type": "string"
@@ -51,6 +63,11 @@
       },
       "swap_interval": {
         "$ref": "#/definitions/Duration"
+      },
+      "twap_window_seconds": {
+        "type": "integer",
+        "format": "uint64",
+        "minimum": 0.0
       }
     },
     "additionalProperties": false,
@@ -126,6 +143,7 @@
     "title": "ExecuteMsg",
     "oneOf": [
       {
+        "description": "perform swaps required for the dca",
         "type": "object",
         "required": [
           "perform_dca"
@@ -165,6 +183,7 @@
         "additionalProperties": false
       },
       {
+        "description": "cancel the dca",
         "type": "object",
         "required": [
           "cancel_dca"
@@ -184,12 +203,7 @@
     "title": "QueryMsg",
     "oneOf": [
       {
-        "type": "string",
-        "enum": [
-          "get_source_funds"
-        ]
-      },
-      {
+        "description": "get the next swap that will be performed",
         "type": "object",
         "required": [
           "get_upcoming_swap"
@@ -203,6 +217,7 @@
         "additionalProperties": false
       },
       {
+        "description": "get all upcoming swaps",
         "type": "object",
         "required": [
           "get_all_upcoming_swaps"
@@ -216,6 +231,14 @@
         "additionalProperties": false
       },
       {
+        "description": "get the amount of funds that are bonded",
+        "type": "string",
+        "enum": [
+          "get_source_funds"
+        ]
+      },
+      {
+        "description": "get the amount of funds that are claimable",
         "type": "object",
         "required": [
           "get_all_funds"
@@ -229,6 +252,7 @@
         "additionalProperties": false
       },
       {
+        "description": "get the strategy config",
         "type": "object",
         "required": [
           "config"
@@ -242,6 +266,7 @@
         "additionalProperties": false
       },
       {
+        "description": "get the strategy state",
         "type": "object",
         "required": [
           "state"
@@ -274,7 +299,8 @@
         "router_contract",
         "source_denom",
         "strategy_type",
-        "swap_interval"
+        "swap_interval",
+        "twap_window_seconds"
       ],
       "properties": {
         "amount_per_trade": {
@@ -287,7 +313,7 @@
           }
         },
         "executor_address": {
-          "$ref": "#/definitions/CanonicalAddr"
+          "$ref": "#/definitions/Addr"
         },
         "max_slippage": {
           "$ref": "#/definitions/Decimal"
@@ -302,7 +328,7 @@
           "type": "string"
         },
         "router_contract": {
-          "type": "string"
+          "$ref": "#/definitions/Addr"
         },
         "source_denom": {
           "type": "string"
@@ -312,21 +338,18 @@
         },
         "swap_interval": {
           "$ref": "#/definitions/Duration"
+        },
+        "twap_window_seconds": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
         }
       },
       "additionalProperties": false,
       "definitions": {
-        "Binary": {
-          "description": "Binary is a wrapper around Vec<u8> to add base64 de/serialization with serde. It also adds some helper methods to help encode inline.\n\nThis is only needed as serde-json-{core,wasm} has a horrible encoding for Vec<u8>. See also <https://github.com/CosmWasm/cosmwasm/blob/main/docs/MESSAGE_TYPES.md>.",
+        "Addr": {
+          "description": "A human readable address.\n\nIn Cosmos, this is typically bech32 encoded. But for multi-chain smart contracts no assumptions should be made other than being UTF-8 encoded and of reasonable length.\n\nThis type represents a validated address. It can be created in the following ways 1. Use `Addr::unchecked(input)` 2. Use `let checked: Addr = deps.api.addr_validate(input)?` 3. Use `let checked: Addr = deps.api.addr_humanize(canonical_addr)?` 4. Deserialize from JSON. This must only be done from JSON that was validated before such as a contract's state. `Addr` must not be used in messages sent by the user because this would result in unvalidated instances.\n\nThis type is immutable. If you really need to mutate it (Really? Are you sure?), create a mutable copy using `let mut mutable = Addr::to_string()` and operate on that `String` instance.",
           "type": "string"
-        },
-        "CanonicalAddr": {
-          "description": "A blockchain address in its binary form.\n\nThe specific implementation is up to the underlying chain and CosmWasm as well as contracts should not make assumptions on that data. In Ethereum for example, an `Addr` would contain a user visible address like 0x14d3cc818735723ab86eaf9502376e847a64ddad and the corresponding `CanonicalAddr` would store the 20 bytes 0x14, 0xD3, ..., 0xAD. In Cosmos, the bech32 format is used for `Addr`s and the `CanonicalAddr` holds the encoded bech32 data without the checksum. Typical sizes are 20 bytes for externally owned addresses and 32 bytes for module addresses (such as x/wasm contract addresses). That being said, a chain might decide to use any size other than 20 or 32 bytes.\n\nThe safe way to obtain a valid `CanonicalAddr` is using `Api::addr_canonicalize`. In addition to that there are many unsafe ways to convert any binary data into an instance. So the type shoud be treated as a marker to express the intended data type, not as a validity guarantee of any sort.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/Binary"
-            }
-          ]
         },
         "CoinWeight": {
           "type": "object",
